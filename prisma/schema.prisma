@@ -1,0 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Log {
+  id      String   @id @default(cuid())
+  message String
+  date    DateTime
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scopes            String[]
+  id_token          String?  @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  cid           String
+  firstName     String?
+  lastName      String?
+  fullName      String?
+  email         String?   @unique
+  emailVerified DateTime?
+  artcc         String
+  rating        Int
+  division      String
+
+  accounts Account[]
+  sessions Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model TmuNotice {
+  id                    String     @id @default(cuid())
+  message               String
+  broadcastedFacilities Facility[]
+}
+
+model Facility {
+  id         String      @id @default(cuid())
+  airport    Airport?
+  radar      Radar?
+  tmuNotices TmuNotice[]
+}
+
+model Airport {
+  id         String          @id @default(cuid())
+  icao       String          @unique
+  iata       String          @unique
+  facility   Facility        @relation(fields: [facilityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  facilityId String          @unique
+  localSplit String[]
+  notams     String[]
+  sopLink    String
+  runways    AirportRunway[]
+  radars     Radar[]
+  presets    FlowPreset[]
+}
+
+model AirportRunway {
+  id                      String             @id @default(cuid())
+  runwayIdentifier        String
+  availableDepartureTypes String[]
+  availableApproachTypes  String[]
+  inUseDepartureTypes     String[]
+  inUseApproachTypes      String[]
+  airport                 Airport            @relation(fields: [airportId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  airportId               String
+  flowPresetRunways       FlowPresetRunway[]
+}
+
+model FlowPreset {
+  id         String             @id @default(cuid())
+  presetName String
+  atisType   FlowPresetAtisType
+  airport    Airport            @relation(fields: [airportId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  airportId  String
+  runways    FlowPresetRunway[]
+}
+
+enum FlowPresetAtisType {
+  COMBINED
+  DEPARTURE
+  ARRIVAL
+}
+
+model FlowPresetRunway {
+  id             String        @id @default(cuid())
+  flowPreset     FlowPreset    @relation(fields: [flowPresetId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  flowPresetId   String
+  runway         AirportRunway @relation(fields: [runwayId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  runwayId       String
+  departureTypes String[]
+  approachTypes  String[]
+}
+
+model Radar {
+  id                String               @id @default(cuid())
+  identifier        String               @unique
+  name              String
+  facility          Facility             @relation(fields: [facilityId], references: [id])
+  facilityId        String               @unique
+  atcPrefixes       String[]
+  radarSplit        String[]
+  notams            String[]
+  isEnrouteFacility Boolean
+  sopLink           String
+  connectedAirports Airport[]
+  sectors           RadarSector[]
+  consolidations    RadarConsolidation[]
+}
+
+model RadarSector {
+  id                          String               @id @default(cuid())
+  identifier                  String
+  frequency                   String
+  open                        Boolean              @default(false)
+  radar                       Radar                @relation(fields: [radarId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  radarId                     String
+  sectorsThatBorderThisSector RadarSector[]        @relation("borderingSectors")
+  borderingSectors            RadarSector[]        @relation("borderingSectors")
+  primarySectors              RadarConsolidation?  @relation("primarySectors")
+  secondarySectors            RadarConsolidation[] @relation("secondarySectors")
+}
+
+model RadarConsolidation {
+  id               String        @id @default(cuid())
+  radar            Radar         @relation(fields: [radarId], references: [id])
+  radarId          String
+  primarySector    RadarSector   @relation("primarySectors", fields: [primarySectorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  primarySectorId  String        @unique
+  secondarySectors RadarSector[] @relation("secondarySectors")
+}

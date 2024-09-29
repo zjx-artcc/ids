@@ -1,0 +1,32 @@
+import React from 'react';
+import prisma from "@/lib/db";
+import {Typography} from "@mui/material";
+import {notFound} from "next/navigation";
+import FlowPresetForm from "@/components/Admin/FlowPreset/FlowPresetForm";
+
+export default async function Page({params}: { params: { icao: string } }) {
+
+    const {icao} = params;
+
+    const allRunways = await prisma.airportRunway.findMany({
+        where: {
+            airport: {
+                icao,
+            },
+        },
+        orderBy: {
+            runwayIdentifier: 'asc',
+        },
+    });
+
+    if (allRunways.length === 0) {
+        notFound();
+    }
+
+    return (
+        <>
+            <Typography variant="h5" gutterBottom>New Flow Preset - {icao}</Typography>
+            <FlowPresetForm icao={icao} allRunways={allRunways}/>
+        </>
+    );
+}
