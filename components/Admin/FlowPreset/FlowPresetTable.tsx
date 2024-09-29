@@ -12,10 +12,12 @@ export default function FlowPresetTable() {
 
     const columns: GridColDef[] = [
         {
-            field: 'presetName',
-            headerName: 'Preset Name',
+            field: 'airport',
+            headerName: 'Airport',
             flex: 1,
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            renderCell: (params) => params.row.airport.icao,
+            sortable: false,
         },
         {
             field: 'atisType',
@@ -26,12 +28,10 @@ export default function FlowPresetTable() {
             filterOperators: getGridSingleSelectOperators().filter((operator) => operator.value === 'is'),
         },
         {
-            field: 'airport',
-            headerName: 'Airport',
+            field: 'presetName',
+            headerName: 'Preset Name',
             flex: 1,
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
-            renderCell: (params) => params.row.airport.icao,
-            sortable: false,
         },
         {
             field: 'actions',

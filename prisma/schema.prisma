@@ -136,7 +136,7 @@ model Radar {
   id                String               @id @default(cuid())
   identifier        String               @unique
   name              String
-  facility          Facility             @relation(fields: [facilityId], references: [id])
+  facility          Facility             @relation(fields: [facilityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   facilityId        String               @unique
   atcPrefixes       String[]
   radarSplit        String[]

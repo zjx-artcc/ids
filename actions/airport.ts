@@ -77,7 +77,7 @@ export const createOrUpdateAirport = async (formData: FormData) => {
         radars: z.array(z.string()),
     });
 
-    const data = airportZ.safeParse({
+    const result = airportZ.safeParse({
         id: formData.get("id") as string,
         icao: formData.get("icao") as string,
         iata: formData.get("iata") as string,
@@ -86,50 +86,61 @@ export const createOrUpdateAirport = async (formData: FormData) => {
         radars: JSON.parse(formData.get("radars") as string),
     });
 
-    if (!data.success) {
-        return {errors: data.error.errors};
+    if (!result.success) {
+        return {errors: result.error.errors};
     }
+
+    await prisma.facility.updateMany({
+        data: {
+            id: result.data.iata,
+        },
+        where: {
+            radar: {
+                id: result.data.id,
+            },
+        },
+    });
 
     const airport = await prisma.airport.upsert({
         create: {
-            icao: data.data.icao,
-            iata: data.data.iata,
-            sopLink: data.data.sopLink,
+            icao: result.data.icao,
+            iata: result.data.iata,
+            sopLink: result.data.sopLink,
             facility: {
                 connectOrCreate: {
-                    where: {id: data.data.iata},
+                    where: {id: result.data.iata},
                     create: {
-                        id: data.data.iata,
+                        id: result.data.iata,
                     }
                 },
             },
             runways: {
-                create: data.data.runways.map((runway) => ({
+                create: result.data.runways.map((runway) => ({
                     runwayIdentifier: runway.runwayIdentifier,
                     availableDepartureTypes: {set: runway.availableDepartureTypes},
                     availableApproachTypes: {set: runway.availableApproachTypes},
                 })),
             },
             radars: {
-                connect: data.data.radars.map((radarId) => ({id: radarId})),
+                connect: result.data.radars.map((radarId) => ({id: radarId})),
             },
         },
         update: {
-            icao: data.data.icao,
-            iata: data.data.iata,
+            icao: result.data.icao,
+            iata: result.data.iata,
             runways: {
-                upsert: data.data.runways.map((runway) => ({
+                upsert: result.data.runways.map((runway) => ({
                     create: runway,
                     update: runway,
                     where: {id: runway.id || ''},
                 })),
             },
             radars: {
-                set: data.data.radars.map((radarId) => ({id: radarId})),
+                set: result.data.radars.map((radarId) => ({id: radarId})),
             },
         },
         where: {
-            id: data.data.id || '',
+            id: result.data.id || '',
         },
     });
 

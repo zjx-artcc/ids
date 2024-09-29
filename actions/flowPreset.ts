@@ -48,8 +48,8 @@ const getWhere = (filter?: GridFilterItem): Prisma.FlowPresetWhereInput => {
         case 'airport':
             return {
                 airport: {
-                    iata: {
-                        contains: filter.value as string,
+                    icao: {
+                        [filter.operator]: filter.value as string,
                         mode: 'insensitive',
                     },
                 },

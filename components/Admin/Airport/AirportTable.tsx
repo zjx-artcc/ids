@@ -45,7 +45,7 @@ export default function AirportTable() {
             headerName: 'Actions',
             getActions: (params) => [
                 <EditButton key={params.row.id} id={params.row.id} label="Edit Airport"
-                            editUrl={`/admin/airports/${params.row.icao}`}/>,
+                            editUrl={`/admin/airports/${params.row.id}`}/>,
                 <DeleteButton key={params.row.id} id={params.row.iata} label="Delete Airport"
                               deleteFunction={deleteFacility}
                               onSuccess={() => toast.success('Airport deleted successfully!')}

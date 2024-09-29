@@ -1,7 +1,7 @@
 import {Card, CardContent, List, ListItemButton, ListItemIcon, ListItemText, Typography} from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
-import {AirplanemodeActive, CellTower, FileOpen, Home} from "@mui/icons-material";
+import {AirplanemodeActive, CellTower, FileOpen, Home, Radar} from "@mui/icons-material";
 
 export default function AdminMenu() {
     return (
@@ -31,6 +31,14 @@ export default function AdminMenu() {
                                 <FileOpen/>
                             </ListItemIcon>
                             <ListItemText primary="Flow Presets"/>
+                        </ListItemButton>
+                    </Link>
+                    <Link href="/admin/radars" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <Radar/>
+                            </ListItemIcon>
+                            <ListItemText primary="Radar Facilities"/>
                         </ListItemButton>
                     </Link>
                     <Link href="/admin/tmu" style={{textDecoration: 'none', color: 'inherit',}}>

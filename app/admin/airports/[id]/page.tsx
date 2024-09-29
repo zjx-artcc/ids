@@ -4,13 +4,13 @@ import {Typography} from "@mui/material";
 import AirportForm from "@/components/Admin/Airport/AirportForm";
 import {notFound} from "next/navigation";
 
-export default async function Page({params}: { params: { icao: string } }) {
+export default async function Page({params}: { params: { id: string } }) {
 
-    const {icao} = params;
+    const {id} = params;
 
     const airport = await prisma.airport.findUnique({
         where: {
-            icao,
+            id,
         },
         include: {
             radars: true,
