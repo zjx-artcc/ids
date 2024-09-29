@@ -84,9 +84,9 @@ export default function AirportForm({airport, currentRunways, currentRadars, all
                         multiple
                         options={allRadars}
                         getOptionLabel={(option) => option.identifier}
-                        value={allRadars.filter((u) => radars.includes(u.identifier))}
+                        value={allRadars.filter((u) => radars.includes(u.id))}
                         onChange={(event, newValue) => {
-                            setRadars(newValue.map((radar) => radar.identifier));
+                            setRadars(newValue.map((radar) => radar.id));
                         }}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => (

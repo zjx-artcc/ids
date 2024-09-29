@@ -90,17 +90,6 @@ export const createOrUpdateAirport = async (formData: FormData) => {
         return {errors: result.error.errors};
     }
 
-    await prisma.facility.updateMany({
-        data: {
-            id: result.data.iata,
-        },
-        where: {
-            radar: {
-                id: result.data.id,
-            },
-        },
-    });
-
     const airport = await prisma.airport.upsert({
         create: {
             icao: result.data.icao,
