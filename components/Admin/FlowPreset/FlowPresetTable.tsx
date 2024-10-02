@@ -1,9 +1,9 @@
 'use client';
 import React from 'react';
 import {getGridSingleSelectOperators, GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
-import EditButton from "@/components/GridButton/EditButton";
-import DeleteButton from "@/components/GridButton/DeleteButton";
+import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/Admin/DataTable/DataTable";
+import EditButton from "@/components/Admin/GridButton/EditButton";
+import DeleteButton from "@/components/Admin/GridButton/DeleteButton";
 import {toast} from "react-toastify";
 import {deleteFlowPreset, fetchFlowPresets} from "@/actions/flowPreset";
 import {FlowPresetAtisType} from "@prisma/client";

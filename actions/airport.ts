@@ -90,6 +90,12 @@ export const createOrUpdateAirport = async (formData: FormData) => {
         return {errors: result.error.errors};
     }
 
+    await prisma.airportRunway.deleteMany({
+        where: {
+            airportId: result.data.id || '',
+        },
+    });
+
     const airport = await prisma.airport.upsert({
         create: {
             icao: result.data.icao,
@@ -118,10 +124,10 @@ export const createOrUpdateAirport = async (formData: FormData) => {
             icao: result.data.icao,
             iata: result.data.iata,
             runways: {
-                upsert: result.data.runways.map((runway) => ({
-                    create: runway,
-                    update: runway,
-                    where: {id: runway.id || ''},
+                create: result.data.runways.map((runway) => ({
+                    runwayIdentifier: runway.runwayIdentifier,
+                    availableDepartureTypes: runway.availableDepartureTypes,
+                    availableApproachTypes: runway.availableApproachTypes,
                 })),
             },
             radars: {

@@ -1,13 +1,14 @@
 'use client';
 import React from 'react';
 import {GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
-import EditButton from "@/components/GridButton/EditButton";
-import DeleteButton from "@/components/GridButton/DeleteButton";
+import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/Admin/DataTable/DataTable";
+import EditButton from "@/components/Admin/GridButton/EditButton";
+import DeleteButton from "@/components/Admin/GridButton/DeleteButton";
 import {toast} from "react-toastify";
 import {deleteTmu, fetchTmu} from "@/actions/tmu";
 import {Facility} from "@prisma/client";
 import {Chip} from "@mui/material";
+import {socket} from "@/lib/socket";
 
 export default function TmuTable() {
 
@@ -42,7 +43,12 @@ export default function TmuTable() {
                 <EditButton key={params.row.id} id={params.row.id} label="Edit Notice"
                             editUrl={`/admin/tmu/${params.row.id}`}/>,
                 <DeleteButton key={params.row.id} id={params.row.id} label="Delete Notice" deleteFunction={deleteTmu}
-                              onSuccess={() => toast.success('Notice deleted successfully!')}
+                              onSuccess={() => {
+                                  toast.success('Notice deleted successfully!');
+                                  for (const facility of params.row.broadcastedFacilities) {
+                                      socket.emit(`${facility.id}-tmu`);
+                                  }
+                              }}
                               warningMessage="Are you sure you want to delete this notice? Click again to confirm."/>,
             ],
             flex: 1,

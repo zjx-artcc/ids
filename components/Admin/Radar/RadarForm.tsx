@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import {Radar} from "@prisma/client";
 import {Autocomplete, Chip, FormControlLabel, Grid2, Switch, TextField} from "@mui/material";
-import FormSaveButton from "@/components/Form/FormSaveButton";
+import FormSaveButton from "@/components/Admin/Form/FormSaveButton";
 import {createOrUpdateRadar} from "@/actions/radar";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";

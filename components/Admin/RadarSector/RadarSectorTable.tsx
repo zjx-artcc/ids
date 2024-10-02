@@ -2,10 +2,10 @@
 import React from 'react';
 import {Radar, RadarSector} from "@prisma/client";
 import {GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
+import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/Admin/DataTable/DataTable";
 import {Chip} from "@mui/material";
-import EditButton from "@/components/GridButton/EditButton";
-import DeleteButton from "@/components/GridButton/DeleteButton";
+import EditButton from "@/components/Admin/GridButton/EditButton";
+import DeleteButton from "@/components/Admin/GridButton/DeleteButton";
 import {toast} from "react-toastify";
 import {deleteRadarSector, fetchRadarSectors} from "@/actions/radarSector";
 

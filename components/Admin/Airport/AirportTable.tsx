@@ -1,12 +1,12 @@
 'use client';
 import React from 'react';
 import {GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
 import {fetchAirports} from "@/actions/airport";
-import DeleteButton from "@/components/GridButton/DeleteButton";
 import {toast} from "react-toastify";
-import EditButton from "@/components/GridButton/EditButton";
 import {deleteFacility} from "@/actions/facility";
+import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/Admin/DataTable/DataTable";
+import EditButton from "@/components/Admin/GridButton/EditButton";
+import DeleteButton from "@/components/Admin/GridButton/DeleteButton";
 
 export default function AirportTable() {
 

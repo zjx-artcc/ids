@@ -1,10 +1,10 @@
 'use client';
 import React from 'react';
 import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
+import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/Admin/DataTable/DataTable";
 import {Chip} from "@mui/material";
-import EditButton from "@/components/GridButton/EditButton";
-import DeleteButton from "@/components/GridButton/DeleteButton";
+import EditButton from "@/components/Admin/GridButton/EditButton";
+import DeleteButton from "@/components/Admin/GridButton/DeleteButton";
 import {deleteFacility} from "@/actions/facility";
 import {toast} from "react-toastify";
 import {fetchRadars} from "@/actions/radar";

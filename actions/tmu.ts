@@ -1,10 +1,22 @@
 'use server';
 
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {Prisma} from "@prisma/client";
+import {Facility, Prisma} from "@prisma/client";
 import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";
 import {z} from "zod";
+
+export const fetchSingleTmu = async (facility: Facility) => {
+    return prisma.tmuNotice.findMany({
+        where: {
+            broadcastedFacilities: {
+                some: {
+                    id: facility.id,
+                },
+            },
+        },
+    });
+}
 
 export const fetchTmu = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
     const orderBy: Prisma.TmuNoticeOrderByWithRelationInput = {};
@@ -93,6 +105,9 @@ export const createOrUpdateTmu = async (formData: FormData) => {
         },
         where: {
             id: result.data.id || '',
+        },
+        include: {
+            broadcastedFacilities: true,
         },
     });
 

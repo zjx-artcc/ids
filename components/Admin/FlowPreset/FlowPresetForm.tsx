@@ -4,7 +4,7 @@ import {AirportRunway, FlowPreset, FlowPresetAtisType, FlowPresetRunway} from "@
 import {Box, FormControl, Grid2, IconButton, InputLabel, MenuItem, Select, TextField, Typography} from "@mui/material";
 import FlowPresetRunwayForm from "@/components/Admin/FlowPreset/FlowPresetRunwayForm";
 import {Delete} from "@mui/icons-material";
-import FormSaveButton from "@/components/Form/FormSaveButton";
+import FormSaveButton from "@/components/Admin/Form/FormSaveButton";
 import {createOrUpdateFlowPreset} from "@/actions/flowPreset";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";

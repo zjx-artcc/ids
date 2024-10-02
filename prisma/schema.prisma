@@ -82,17 +82,18 @@ model Facility {
 }
 
 model Airport {
-  id         String          @id @default(cuid())
-  icao       String          @unique
-  iata       String          @unique
-  facility   Facility        @relation(fields: [facilityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  facilityId String          @unique
-  localSplit String[]
-  notams     String[]
-  sopLink    String
-  runways    AirportRunway[]
-  radars     Radar[]
-  presets    FlowPreset[]
+  id               String            @id @default(cuid())
+  icao             String            @unique
+  iata             String            @unique
+  facility         Facility          @relation(fields: [facilityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  facilityId       String            @unique
+  localSplit       String[]
+  notams           String[]
+  sopLink          String
+  runways          AirportRunway[]
+  airspaceDiagrams AirspaceDiagram[]
+  radars           Radar[]
+  presets          FlowPreset[]
 }
 
 model AirportRunway {
@@ -154,6 +155,7 @@ model RadarSector {
   frequency                   String
   open                        Boolean              @default(false)
   radar                       Radar                @relation(fields: [radarId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  airspaceDiagrams            AirspaceDiagram[]
   radarId                     String
   sectorsThatBorderThisSector RadarSector[]        @relation("borderingSectors")
   borderingSectors            RadarSector[]        @relation("borderingSectors")
@@ -168,4 +170,14 @@ model RadarConsolidation {
   primarySector    RadarSector   @relation("primarySectors", fields: [primarySectorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   primarySectorId  String        @unique
   secondarySectors RadarSector[] @relation("secondarySectors")
+}
+
+model AirspaceDiagram {
+  id        String       @id @default(cuid())
+  name      String
+  key       String
+  airport   Airport?     @relation(fields: [airportId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  airportId String?
+  sector    RadarSector? @relation(fields: [sectorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  sectorId  String?
 }

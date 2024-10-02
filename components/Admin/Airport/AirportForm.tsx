@@ -7,7 +7,7 @@ import AirportRunwayForm from "@/components/Admin/Airport/AirportRunwayForm";
 import {createOrUpdateAirport} from "@/actions/airport";
 import {useRouter} from "next/navigation";
 import {toast} from "react-toastify";
-import FormSaveButton from "@/components/Form/FormSaveButton";
+import FormSaveButton from "@/components/Admin/Form/FormSaveButton";
 
 export default function AirportForm({airport, currentRunways, currentRadars, allRadars}: {
     airport?: Airport,

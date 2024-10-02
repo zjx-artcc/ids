@@ -1,11 +1,12 @@
 'use client';
-import React from 'react';
+import React, {useState} from 'react';
 import {Facility, TmuNotice} from "@prisma/client";
 import {Autocomplete, Box, Button, Chip, Stack, TextField} from "@mui/material";
-import FormSaveButton from "@/components/Form/FormSaveButton";
+import FormSaveButton from "@/components/Admin/Form/FormSaveButton";
 import {createOrUpdateTmu} from "@/actions/tmu";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import {socket} from "@/lib/socket";
 
 export default function TmuForm({tmu, currentFacilities, allFacilities}: {
     tmu?: TmuNotice,
@@ -13,18 +14,21 @@ export default function TmuForm({tmu, currentFacilities, allFacilities}: {
     allFacilities: Facility[]
 }) {
 
-    const [facilities, setFacilities] = React.useState(currentFacilities?.map((f) => f.id) || []);
+    const [facilities, setFacilities] = useState(currentFacilities?.map((f) => f.id) || []);
     const router = useRouter();
 
     const handleSubmit = async (formData: FormData) => {
         formData.set('id', tmu?.id || '');
         formData.set('facilities', JSON.stringify(facilities));
-        const {errors} = await createOrUpdateTmu(formData);
+        const {tmu: newTmu, errors} = await createOrUpdateTmu(formData);
         if (errors) {
             toast.error(errors.map((error) => error.message).join('. '));
             return;
         }
         toast.success(tmu ? `Updated T.M.U. Notice` : `Created T.M.U. Notice`);
+        for (const facility of newTmu.broadcastedFacilities) {
+            socket.emit(`${facility.id}-tmu`);
+        }
         if (!tmu) {
             router.push('/admin/tmu');
         }
