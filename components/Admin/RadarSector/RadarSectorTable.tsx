@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Radar, RadarSector} from "@prisma/client";
+import {Radar} from "@prisma/client";
 import {GridColDef} from "@mui/x-data-grid";
 import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/Admin/DataTable/DataTable";
 import {Chip} from "@mui/material";
@@ -31,7 +31,11 @@ export default function RadarSectorTable({radar}: { radar: Radar, }) {
             flex: 1,
             filterOperators: [...containsOnlyFilterOperator],
             sortable: false,
-            renderCell: (params) => params.row.borderingSectors.map((sector: RadarSector | any) => {
+            renderCell: (params) => params.row.borderingSectors.map((sector: {
+                id: string,
+                radar: Radar,
+                identifier: string,
+            }) => {
                 return (
                     <Chip
                         key={sector.id}

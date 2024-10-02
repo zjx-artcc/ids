@@ -1,6 +1,6 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {CircularProgress, Container, Divider, Grid2, Stack, Typography} from "@mui/material";
+import {CircularProgress, Divider, Grid2, Stack, Typography} from "@mui/material";
 import {AtisUpdate} from "@/types";
 import {fetchMetar} from "@/actions/atis";
 import {socket} from "@/lib/socket";

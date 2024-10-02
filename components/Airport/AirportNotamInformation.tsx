@@ -18,7 +18,7 @@ export default function AirportNotamInformation({airport}: { airport: Airport, }
         <Grid2 size={5} sx={{border: 1,}}>
             <Typography variant="h6">NOTAM</Typography>
             <Box height={250} sx={{overflow: 'auto',}}>
-                {airport.notams.map((notam, idx) => (
+                {notams.map((notam, idx) => (
                     <Typography key={airport.icao + idx + 'NOTAM'} color="gray">{notam}</Typography>
                 ))}
             </Box>

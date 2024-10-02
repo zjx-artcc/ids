@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react';
 import {fetchAllFacilities, getSopLink} from "@/actions/facility";
 import {Facility} from "@prisma/client";
-import {Autocomplete, Card, CardContent, Divider, Stack, TextField, Typography} from "@mui/material";
+import {Autocomplete, Card, CardContent, Divider, TextField} from "@mui/material";
 import UrlViewer from "@/components/Viewer/UrlViewer";
 
 export default function SopViewer({defaultFacility}: { defaultFacility?: string, }) {
@@ -27,7 +27,7 @@ export default function SopViewer({defaultFacility}: { defaultFacility?: string,
             getSopLink(selectedFacility.id).then(setSopLink);
         }
 
-    }, [facilities, selectedFacility]);
+    }, [defaultFacility, facilities, selectedFacility]);
 
     return (
         <>

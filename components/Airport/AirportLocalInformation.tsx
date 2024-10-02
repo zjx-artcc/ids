@@ -1,6 +1,6 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {Box, Button, Grid2, Typography} from "@mui/material";
+import {Box, Grid2, Typography} from "@mui/material";
 import {getColor} from "@/lib/facilityColor";
 import {Airport} from "@prisma/client";
 import {socket} from "@/lib/socket";
