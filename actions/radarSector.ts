@@ -5,6 +5,14 @@ import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-gr
 import {Prisma, Radar} from "@prisma/client";
 import {z} from "zod";
 
+export const fetchAllRadarSectors = async () => {
+    return prisma.radarSector.findMany({
+        include: {
+            radar: true,
+        },
+    });
+}
+
 export const fetchRadarSectors = async (radar: Radar, pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
     const orderBy: Prisma.RadarSectorOrderByWithRelationInput = {};
     if (sort.length > 0) {

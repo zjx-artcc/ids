@@ -1,7 +1,7 @@
 import {Card, CardContent, List, ListItemButton, ListItemIcon, ListItemText, Typography} from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
-import {AirplanemodeActive, CellTower, FileOpen, Home, PieChart, Radar} from "@mui/icons-material";
+import {AirplanemodeActive, CellTower, FileOpen, GridView, Home, PieChart, Radar} from "@mui/icons-material";
 
 export default function AdminMenu() {
     return (
@@ -39,6 +39,14 @@ export default function AdminMenu() {
                                 <Radar/>
                             </ListItemIcon>
                             <ListItemText primary="Radar Facilities"/>
+                        </ListItemButton>
+                    </Link>
+                    <Link href="/admin/radar-consolidations" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <GridView/>
+                            </ListItemIcon>
+                            <ListItemText primary="Default Consolidations"/>
                         </ListItemButton>
                     </Link>
                     <Link href="/admin/airspaces" style={{textDecoration: 'none', color: 'inherit',}}>

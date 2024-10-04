@@ -4,6 +4,7 @@ import {Radar} from "@prisma/client";
 import {socket} from "@/lib/socket";
 import {Box, Grid2, Typography} from "@mui/material";
 import {getColor} from "@/lib/facilityColor";
+import {toast} from "react-toastify";
 
 export default function AirportRadarInformation({radars}: { radars: Radar[], }) {
 
@@ -25,7 +26,7 @@ export default function AirportRadarInformation({radars}: { radars: Radar[], }) 
                 facility: number,
             }[])
                 .filter((c) => radars.some((r) => r.atcPrefixes.some((prefix) => c.callsign.startsWith(prefix))))
-                .filter((c) => c.facility > 0)
+                .filter((c) => c.facility > 4)
                 .sort((a, b) => a.callsign.localeCompare(b.callsign))
                 .sort((a, b) => a.facility - b.facility)
                 .map((controller) => ({
@@ -42,6 +43,7 @@ export default function AirportRadarInformation({radars}: { radars: Radar[], }) 
                     .sort((a, b) => Number(a.radar.isEnrouteFacility) - Number(b.radar.isEnrouteFacility))
                     .sort((a, b) => a.radar.facilityId.localeCompare(b.radar.facilityId))
                 );
+                toast.info(`${r.facilityId} radar split has been updated.`);
             });
         });
     }, [radars]);

@@ -5,6 +5,36 @@ import {Prisma} from "@prisma/client";
 import prisma from "@/lib/db";
 import {z} from "zod";
 
+export const fetchAllRadars = async () => {
+    return prisma.radar.findMany({
+        orderBy: {
+            identifier: 'asc',
+        },
+    });
+}
+
+export const updateRadarSplit = async (radarId: string, radarSplit: string[]) => {
+    return prisma.radar.update({
+        where: {
+            id: radarId,
+        },
+        data: {
+            radarSplit,
+        },
+    });
+}
+
+export const updateNotams = async (radarId: string, notams: string[]) => {
+    return prisma.radar.update({
+        where: {
+            id: radarId,
+        },
+        data: {
+            notams,
+        },
+    });
+}
+
 export const fetchRadars = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
     const orderBy: Prisma.RadarOrderByWithRelationInput = {};
     if (sort.length > 0) {

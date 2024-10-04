@@ -1,15 +1,15 @@
 import React from 'react';
 import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
-import {Grid2} from "@mui/material";
+import {Grid2, Typography} from "@mui/material";
 import AirportAtisGridItems from "@/components/Airport/AirportAtisGridItems";
 import AirportFlowGridItem from "@/components/Airport/AirportFlowGridItem";
 import AirportLocalInformation from "@/components/Airport/AirportLocalInformation";
-import AirportNotamInformation from "@/components/Airport/AirportNotamInformation";
+import NotamInformation from "@/components/Notam/NotamInformation";
 import TmuGridItem from "@/components/Tmu/TmuGridItem";
 import AirportRadarInformation from "@/components/Airport/AirportRadarInformation";
-import AirportChartsGridItem from "@/components/Airport/AirportChartsGridItem";
-import AirportButtonsTray from "@/components/Airport/AirportButtonsTray";
+import AirportCharts from "@/components/Airport/AirportCharts";
+import ButtonsTray from "@/components/Tray/ButtonsTray";
 import Viewer from "@/components/Viewer/Viewer";
 
 export default async function Page({params}: { params: { id: string } }) {
@@ -34,13 +34,15 @@ export default async function Page({params}: { params: { id: string } }) {
         <Grid2 container columns={12}>
             <AirportAtisGridItems icao={airport.icao}/>
             <AirportFlowGridItem airport={airport} runways={airport.runways}/>
-            <AirportLocalInformation airport={airport}
-                                     prefixes={airport.radars.map((radar) => radar.atcPrefixes).flat()}/>
-            <AirportNotamInformation airport={airport}/>
+            <AirportLocalInformation airport={airport}/>
+            <NotamInformation facility={airport.facility} initialNotams={airport.notams}/>
             <TmuGridItem facility={airport.facility}/>
             <AirportRadarInformation radars={airport.radars}/>
-            <AirportChartsGridItem airport={airport}/>
-            <AirportButtonsTray airport={airport}/>
+            <Grid2 size={6} sx={{border: 1,}}>
+                <Typography variant="h6">CHARTS</Typography>
+                <AirportCharts icao={airport.icao}/>
+            </Grid2>
+            <ButtonsTray airport={airport}/>
             <Viewer/>
         </Grid2>
     );

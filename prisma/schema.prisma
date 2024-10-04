@@ -56,6 +56,8 @@ model User {
   rating        Int
   division      String
 
+  consolidations RadarConsolidation[]
+
   accounts Account[]
   sessions Session[]
 }
@@ -134,11 +136,11 @@ model FlowPresetRunway {
 }
 
 model Radar {
-  id                String               @id @default(cuid())
-  identifier        String               @unique
+  id                String        @id @default(cuid())
+  identifier        String        @unique
   name              String
-  facility          Facility             @relation(fields: [facilityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  facilityId        String               @unique
+  facility          Facility      @relation(fields: [facilityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  facilityId        String        @unique
   atcPrefixes       String[]
   radarSplit        String[]
   notams            String[]
@@ -146,30 +148,40 @@ model Radar {
   sopLink           String
   connectedAirports Airport[]
   sectors           RadarSector[]
-  consolidations    RadarConsolidation[]
 }
 
 model RadarSector {
-  id                          String               @id @default(cuid())
+  id                          String                      @id @default(cuid())
   identifier                  String
   frequency                   String
-  open                        Boolean              @default(false)
-  radar                       Radar                @relation(fields: [radarId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  open                        Boolean                     @default(false)
+  radar                       Radar                       @relation(fields: [radarId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   airspaceDiagrams            AirspaceDiagram[]
   radarId                     String
-  sectorsThatBorderThisSector RadarSector[]        @relation("borderingSectors")
-  borderingSectors            RadarSector[]        @relation("borderingSectors")
-  primarySectors              RadarConsolidation?  @relation("primarySectors")
-  secondarySectors            RadarConsolidation[] @relation("secondarySectors")
+  sectorsThatBorderThisSector RadarSector[]               @relation("borderingSectors")
+  borderingSectors            RadarSector[]               @relation("borderingSectors")
+  primarySectors              RadarConsolidation?         @relation("primarySectors")
+  secondarySectors            RadarConsolidation[]        @relation("secondarySectors")
+  defaultPrimarySectors       DefaultRadarConsolidation[] @relation("defaultPrimarySectors")
+  defaultSecondarySectors     DefaultRadarConsolidation[] @relation("defaultSecondarySectors")
+  defaultRadarConsolidationId String?
 }
 
 model RadarConsolidation {
   id               String        @id @default(cuid())
-  radar            Radar         @relation(fields: [radarId], references: [id])
-  radarId          String
+  user             User          @relation(fields: [userId], references: [id])
+  userId           String
   primarySector    RadarSector   @relation("primarySectors", fields: [primarySectorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   primarySectorId  String        @unique
   secondarySectors RadarSector[] @relation("secondarySectors")
+}
+
+model DefaultRadarConsolidation {
+  id               String        @id @default(cuid())
+  name             String
+  primarySector    RadarSector   @relation("defaultPrimarySectors", fields: [primarySectorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  primarySectorId  String
+  secondarySectors RadarSector[] @relation("defaultSecondarySectors")
 }
 
 model AirspaceDiagram {

@@ -41,6 +41,7 @@ declare module "next-auth" {
     }
 
     interface User {
+        id: string,
         cid: string,
         firstName: string,
         lastName: string,
@@ -52,6 +53,7 @@ declare module "next-auth" {
     }
 
     interface AdapterUser {
+        id: string,
         cid: string,
         firstName: string,
         lastName: string,
@@ -64,6 +66,7 @@ declare module "next-auth" {
 
     interface Session {
         user: {
+            id: string,
             cid: string,
             firstName: string,
             lastName: string,

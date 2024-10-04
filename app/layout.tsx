@@ -8,7 +8,7 @@ import theme from "@/theme/theme";
 import Navbar from "@/components/Navbar/Navbar";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
-import {Container} from "@mui/material";
+import {Container, Typography} from "@mui/material";
 import {ToastContainer} from "react-toastify";
 
 const roboto = Roboto({
@@ -32,7 +32,11 @@ export default async function RootLayout({
     <AppRouterCacheProvider>
         <ThemeProvider theme={theme}>
             <Navbar session={session}/>
-            <Container maxWidth="xl">
+            <Container maxWidth="xl" sx={{display: {xs: 'flex', lg: 'none'},}}>
+                <Typography variant="h6" textAlign="center">The I.D.S. is not made for smaller screen sizes. Please
+                    increase your screen size to access the IDS.</Typography>
+            </Container>
+            <Container maxWidth="xl" sx={{display: {xs: 'none', lg: 'flex'},}}>
                 {children}
             </Container>
             <ToastContainer theme="dark"/>

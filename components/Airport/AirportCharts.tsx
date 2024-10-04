@@ -1,19 +1,26 @@
 'use client';
 import React, {useEffect} from 'react';
-import {Airport} from "@prisma/client";
-import {Box, Button, ButtonGroup, Grid2, Typography} from "@mui/material";
+import {Box, Button, ButtonGroup, CircularProgress} from "@mui/material";
 import {fetchCharts} from "@/actions/charts";
 import {usePathname, useRouter} from "next/navigation";
+import {toast} from "react-toastify";
 
-export default function AirportChartsGridItem({airport}: { airport: Airport }) {
+export default function AirportCharts({icao}: { icao: string, }) {
 
     const [charts, setCharts] = React.useState<{ name: string, code: string, url: string, }[]>();
     const router = useRouter();
     const pathName = usePathname();
 
     useEffect(() => {
-        fetchCharts(airport.icao).then((data) => {
-            const sortedCharts = (data[airport.icao] as {
+        fetchCharts(icao).then((data) => {
+
+            if (!data[icao]) {
+                setCharts([]);
+                toast.error('No charts found for this ICAO.');
+                return;
+            }
+
+            const sortedCharts = (data[icao] as {
                 chart_name: string,
                 chart_code: string,
                 pdf_path: string,
@@ -27,7 +34,7 @@ export default function AirportChartsGridItem({airport}: { airport: Airport }) {
             });
             setCharts(sortedCharts);
         });
-    }, [airport]);
+    }, [icao]);
 
     const chartsGroupedByCode = charts?.reduce((acc, chart) => {
         if (!acc[chart.code]) {
@@ -48,25 +55,22 @@ export default function AirportChartsGridItem({airport}: { airport: Airport }) {
     };
 
     return (
-        <Grid2 size={6} sx={{border: 1,}}>
-            <Typography variant="h6">CHARTS</Typography>
-            <Box height={250} sx={{overflow: 'auto',}}>
-                {Object.entries(chartsGroupedByCode || {}).map(([code, charts]) => (
-                    <ButtonGroup
-                        key={airport.icao + 'charts' + code}
-                        variant="outlined"
-                        size="small"
-                        color={getChartColor(code)}
-                        sx={{mb: 2, flexWrap: 'wrap'}}
-                    >
-                        {charts.map((chart) => (
-                            <Button key={chart.url} onClick={() => navigateToChart(chart.url)}>{chart.name}</Button>
-                        ))}
-                    </ButtonGroup>
-                ))}
-            </Box>
-
-        </Grid2>
+        <Box height={250} sx={{overflow: 'auto',}}>
+            {!charts && <CircularProgress/>}
+            {Object.entries(chartsGroupedByCode || {}).map(([code, charts]) => (
+                <ButtonGroup
+                    key={icao + 'charts' + code}
+                    variant="outlined"
+                    size="small"
+                    color={getChartColor(code)}
+                    sx={{mb: 2, flexWrap: 'wrap'}}
+                >
+                    {charts.map((chart) => (
+                        <Button key={chart.url} onClick={() => navigateToChart(chart.url)}>{chart.name}</Button>
+                    ))}
+                </ButtonGroup>
+            ))}
+        </Box>
     );
 
 }

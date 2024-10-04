@@ -4,7 +4,82 @@ import {z} from "zod";
 import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {Prisma} from "@prisma/client";
+import {AirportRunway, Prisma} from "@prisma/client";
+
+export const fetchAllAirports = async () => {
+    return prisma.airport.findMany({
+        orderBy: {
+            icao: 'asc',
+        },
+        include: {
+            runways: true,
+        },
+    });
+}
+
+export const updateFlow = async (criteria: {
+    [key: string]: { inUseDepartureTypes: string[], inUseApproachTypes: string[] }
+}) => {
+    const airportZ = z.object({
+        id: z.string(),
+        runways: z.record(z.object({
+            inUseDepartureTypes: z.array(z.string()),
+            inUseApproachTypes: z.array(z.string()),
+        })),
+    });
+
+    const result = airportZ.safeParse({
+        id: Object.keys(criteria)[0],
+        runways: criteria,
+    });
+
+    if (!result.success) {
+        return {errors: result.error.errors};
+    }
+
+    const runways: AirportRunway[] = [];
+
+    for (const [runwayId, runway] of Object.entries(result.data.runways)) {
+        const savedRunway = await prisma.airportRunway.update({
+            where: {id: runwayId},
+            data: {
+                inUseDepartureTypes: {set: runway.inUseDepartureTypes},
+                inUseApproachTypes: {set: runway.inUseApproachTypes},
+            },
+        });
+        runways.push(savedRunway);
+    }
+
+    revalidatePath('/', "layout");
+
+    return {runways};
+}
+
+export const updateLocalSplit = async (airportId: string, localSplit: string[]) => {
+    const airport = await prisma.airport.update({
+        where: {id: airportId},
+        data: {
+            localSplit: {set: localSplit},
+        },
+    });
+
+    revalidatePath('/', "layout");
+
+    return {airport};
+}
+
+export const updateNotams = async (airportId: string, notams: string[]) => {
+    const airport = await prisma.airport.update({
+        where: {id: airportId},
+        data: {
+            notams: {set: notams},
+        },
+    });
+
+    revalidatePath('/', "layout");
+
+    return {airport};
+}
 
 export const fetchAirports = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
     const orderBy: Prisma.AirportOrderByWithRelationInput = {};

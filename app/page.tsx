@@ -55,7 +55,7 @@ export default async function Home() {
     });
 
     return (
-        <Card sx={{mt: 2,}}>
+        <Card sx={{mt: 2, width: '100%',}}>
             <CardContent>
                 <Typography variant="h5" textAlign="center" gutterBottom>Facility Picker (select one)</Typography>
                 <List

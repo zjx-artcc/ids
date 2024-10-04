@@ -9,6 +9,9 @@ import Weather from "@/components/Viewer/Weather";
 import SopViewer from "@/components/Viewer/SopViewer";
 import PreferredRoutes from "@/components/Viewer/PreferredRoutes";
 import Airspace from "@/components/Viewer/Airspace";
+import AirportSettings from "@/components/Viewer/AirportSettings";
+import RadarSettings from "@/components/Viewer/RadarSettings";
+import Consolidation from "@/components/Viewer/Consolidation";
 
 export default function Viewer() {
 
@@ -29,6 +32,9 @@ export default function Viewer() {
             {display === 'sop' && <SopViewer defaultFacility={sopFacility || undefined}/>}
             {display === 'prd' && <PreferredRoutes startAirport={prdStartAirport || undefined}/>}
             {display === 'airspace' && <Airspace/>}
+            {display === 'set-airport' && <AirportSettings/>}
+            {display === 'set-radar' && <RadarSettings/>}
+            {display === 'consol' && <Consolidation/>}
         </Grid2>
     );
 }

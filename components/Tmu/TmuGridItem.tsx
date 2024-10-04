@@ -4,6 +4,7 @@ import {Facility, TmuNotice} from "@prisma/client";
 import {Box, Grid2, Typography} from "@mui/material";
 import {fetchSingleTmu} from "@/actions/tmu";
 import {socket} from "@/lib/socket";
+import {toast} from "react-toastify";
 
 export default function TmuGridItem({facility}: { facility: Facility, }) {
 
@@ -13,6 +14,7 @@ export default function TmuGridItem({facility}: { facility: Facility, }) {
         fetchSingleTmu(facility).then(setBroadcasts);
         socket.on(`${facility.id}-tmu`, () => {
             fetchSingleTmu(facility).then(setBroadcasts);
+            toast.info(`${facility.id} TMU broadcasts have been updated.`);
         });
     }, [facility]);
 
