@@ -18,6 +18,10 @@ export default function NotamInformation({facility, initialNotams, radar,}: {
             setNotams(data);
             toast.info(`${facility.id} NOTAMs have been updated.`);
         });
+
+        return () => {
+            socket.off(`${facility.id}-notam`);
+        };
     }, [facility]);
 
     return (

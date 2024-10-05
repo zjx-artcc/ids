@@ -20,6 +20,10 @@ export default function AirportFlowGridItem({airport, runways, small}: {
             setArrivalRunways(data.filter(runway => runway.inUseApproachTypes.length > 0));
             toast.info(`${airport.icao} flow has been updated.`);
         });
+
+        return () => {
+            socket.off(`${airport.facilityId}-flow`)
+        };
     }, [airport]);
 
     if (small) {
@@ -28,7 +32,7 @@ export default function AirportFlowGridItem({airport, runways, small}: {
                 <Grid2 size={3} sx={{border: 1,}}>
                     <Typography variant="h6" textAlign="center">
                         <span
-                            style={{color: 'yellow',}}>{arrivalRunways.map((r) => r.runwayIdentifier).join(' ')}</span><span>/</span><span
+                            style={{color: 'yellow',}}>{arrivalRunways.map((r) => r.runwayIdentifier).join(' ')}</span><span> / </span><span
                         style={{color: 'purple',}}>{departureRunways.map((r) => r.runwayIdentifier).join(' ')}</span>
                     </Typography>
                 </Grid2>

@@ -16,6 +16,10 @@ export default function TmuGridItem({facility}: { facility: Facility, }) {
             fetchSingleTmu(facility).then(setBroadcasts);
             toast.info(`${facility.id} TMU broadcasts have been updated.`);
         });
+
+        return () => {
+            socket.off(`${facility.id}-tmu`);
+        };
     }, [facility]);
 
     return (

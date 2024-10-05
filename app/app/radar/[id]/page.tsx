@@ -10,6 +10,26 @@ import AirportInformationSmall from "@/components/Airport/AirportInformationSmal
 import RadarBorderingSectorsGridItem from "@/components/Radar/RadarBorderingSectorsGridItem";
 
 import RadarChartSelector from "@/components/Radar/RadarChartSelector";
+import {Metadata} from "next";
+
+export async function generateMetadata(
+    {params}: { params: { id: string } },
+): Promise<Metadata> {
+    const {id} = params;
+
+    const airport = await prisma.radar.findUnique({
+        where: {
+            facilityId: id,
+        },
+        select: {
+            facilityId: true,
+        },
+    });
+
+    return {
+        title: airport?.facilityId || 'UNKNOWN',
+    }
+}
 
 export default async function Page({params}: { params: { id: string } }) {
 

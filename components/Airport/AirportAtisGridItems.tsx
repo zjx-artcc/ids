@@ -25,29 +25,32 @@ export default function AirportAtisGridItems({icao, small}: { icao: string, smal
             }[])
                 .filter((atis) => atis.callsign.startsWith(icao))
                 .map((atis) => {
+                    let textAtisLetter = atis.atis_code;
+                    if (atis?.text_atis && atis.text_atis.length > 0) {
+                        textAtisLetter = atis.text_atis[0]?.match(/ATIS INFO ([A-Z])/i)?.[1] || '-';
+                    }
+                    const atisLetter = getMoreRecentAtisLetter(atis.atis_code, textAtisLetter);
+
+                    const atisUpdate = {
+                        atisLetter: atisLetter,
+                        airportConditions: atis.text_atis?.join(' ') || 'N/A',
+                        notams: 'N/A',
+                    } as AtisUpdate;
+
                     if (atis.callsign.includes('_D_')) {
-                        setDepartureAtis({
-                            atisLetter: atis.atis_code || '-',
-                            airportConditions: atis.text_atis?.join(' ') || 'N/A',
-                            notams: 'N/A',
-                        } as AtisUpdate);
+                        setDepartureAtis(atisUpdate);
                     } else if (atis.callsign.includes('_A_')) {
-                        setArrivalAtis({
-                            atisLetter: atis.atis_code || '-',
-                            airportConditions: atis.text_atis?.join(' ') || 'N/A',
-                            notams: 'N/A',
-                        } as AtisUpdate);
+                        setArrivalAtis(atisUpdate);
                     } else {
-                        setCombinedAtis({
-                            atisLetter: atis.atis_code || '-',
-                            airportConditions: atis.text_atis?.join(' ') || 'N/A',
-                            notams: 'N/A',
-                        } as AtisUpdate);
+                        setCombinedAtis(atisUpdate);
                     }
                 });
 
         });
 
+        return () => {
+            socket.off('vatsim-data');
+        };
     }, [icao]);
 
     const {wind, altimeter} = getWindAndAltimeter(metar || '');
@@ -146,3 +149,17 @@ export const getWindAndAltimeter = (metar: string) => {
         altimeter: altimeter ? altimeter[0] : 'A0000',
     };
 }
+
+const getMoreRecentAtisLetter = (atisCode: string, textAtisLetter: string): string => {
+    if (!atisCode) return textAtisLetter;
+    if (!textAtisLetter) return atisCode;
+
+    const atisCodeIndex = atisCode.charCodeAt(0);
+    const textAtisLetterIndex = textAtisLetter.charCodeAt(0);
+
+    if (textAtisLetterIndex > atisCodeIndex || (atisCodeIndex === 90 && textAtisLetterIndex === 65)) {
+        return textAtisLetter;
+    }
+
+    return atisCode;
+};

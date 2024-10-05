@@ -1,16 +1,9 @@
-import {
-    Card,
-    CardContent,
-    List,
-    ListItemButton,
-    ListItemText,
-    ListSubheader,
-    Typography
-} from "@mui/material";
+import {Card, CardContent, List, ListItemButton, ListItemText, ListSubheader, Typography} from "@mui/material";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import prisma from "@/lib/db";
 import Link from "next/link";
+
 
 export default async function Home() {
 

@@ -46,6 +46,13 @@ export default function AirportRadarInformation({radars}: { radars: Radar[], }) 
                 toast.info(`${r.facilityId} radar split has been updated.`);
             });
         });
+
+        return () => {
+            socket.off('vatsim-data');
+            radars.forEach((r) => {
+                socket.off(`${r.facilityId}-radar-split`);
+            });
+        };
     }, [radars]);
 
     return (

@@ -1,5 +1,4 @@
 'use server';
-
 import {Radar, RadarSector} from "@prisma/client";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
@@ -30,11 +29,21 @@ export const fetchBorderingSectors = async (): Promise<BorderingSector[]> => {
             primarySector: {
                 include: {
                     radar: true,
+                    borderingSectors: {
+                        include: {
+                            radar: true,
+                        },
+                    },
                 },
             },
             secondarySectors: {
                 include: {
                     radar: true,
+                    borderingSectors: {
+                        include: {
+                            radar: true,
+                        },
+                    },
                 },
             },
         },
@@ -44,52 +53,59 @@ export const fetchBorderingSectors = async (): Promise<BorderingSector[]> => {
         return [];
     }
 
-    const primarySectorId = radarConsolidation.primarySector.id;
-    const secondarySectorIds = radarConsolidation.secondarySectors.map(sector => sector.id);
+    const borderingPrimary = radarConsolidation.primarySector.borderingSectors;
+    const borderingSecondary = radarConsolidation.secondarySectors.flatMap((sector) => sector.borderingSectors);
 
-    // Fetch bordering sectors
-    const borderingSectors = await prisma.radarSector.findMany({
-        where: {
-            OR: [
-                {borderingSectors: {some: {id: primarySectorId}}},
-                {borderingSectors: {some: {id: {in: secondarySectorIds}}}},
-            ],
-        },
-        include: {
-            radar: true,
-        },
-    });
+    const allBorderingSectors = Array.from(new Set([...borderingPrimary, ...borderingSecondary].map(sector => sector.id)))
+        .map(id => [...borderingPrimary, ...borderingSecondary].find(sector => sector.id === id))
+        .filter((sector): sector is RadarSectorWithRadar => sector !== undefined)
+        .filter(sector => sector.id !== radarConsolidation.primarySector.id && !radarConsolidation.secondarySectors.map(s => s.id).includes(sector.id));
 
-    // Remove duplicates
-    const uniqueBorderingSectors = Array.from(new Set(borderingSectors.map(sector => sector.id)))
-        .map(id => borderingSectors.find(sector => sector.id === id))
-        .filter((sector): sector is RadarSectorWithRadar => sector !== undefined); // Type guard to ensure sector is defined
 
-    // Check status of bordering sectors
-    return await Promise.all(uniqueBorderingSectors.map(async (sector) => {
+    const borderingSectors: BorderingSector[] = [];
+
+    for (const sector of allBorderingSectors) {
         const primaryConsolidation = await prisma.radarConsolidation.findFirst({
-            where: {primarySectorId: sector.id},
+            where: {
+                primarySectorId: sector.id,
+            },
         });
 
-        if (primaryConsolidation) {
-            return {sector, status: 'open'};
-        }
-
         const secondaryConsolidation = await prisma.radarConsolidation.findFirst({
-            where: {secondarySectors: {some: {id: sector.id}}},
+            where: {
+                secondarySectors: {
+                    some: {
+                        id: sector.id,
+                    },
+                },
+            },
             include: {
                 primarySector: {
                     include: {
                         radar: true,
                     },
-                }
+                },
             },
         });
 
-        if (secondaryConsolidation) {
-            return {sector, status: 'consolidated', consolidatedTo: secondaryConsolidation.primarySector};
+        if (primaryConsolidation) {
+            borderingSectors.push({
+                sector,
+                status: 'open',
+            });
+        } else if (secondaryConsolidation) {
+            borderingSectors.push({
+                sector,
+                status: 'consolidated',
+                consolidatedTo: secondaryConsolidation.primarySector,
+            });
+        } else {
+            borderingSectors.push({
+                sector,
+                status: 'closed',
+            });
         }
+    }
 
-        return {sector, status: 'closed'};
-    }));
+    return borderingSectors;
 }

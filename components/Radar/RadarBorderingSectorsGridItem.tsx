@@ -17,6 +17,10 @@ export default function RadarBorderingSectorsGridItem({radar}: { radar: Radar, }
             fetchBorderingSectors().then(setBorderingSectors);
             toast.info('Radar consolidations have been updated.  This may or may not include your sectors or bordering sectors.');
         });
+
+        return () => {
+            socket.off('radar-consolidation');
+        };
     }, []);
 
     return (

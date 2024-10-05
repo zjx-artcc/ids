@@ -10,6 +10,7 @@ import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {Container, Typography} from "@mui/material";
 import {ToastContainer} from "react-toastify";
+import {Metadata} from "next";
 
 const roboto = Roboto({
     weight: ['300', '400', '500', '700'],
@@ -17,6 +18,11 @@ const roboto = Roboto({
     display: 'swap',
     variable: '--font-roboto',
 });
+
+export const metadata: Metadata = {
+    title: 'vZDC IDS',
+    description: 'vZDC IDS',
+};
 
 export default async function RootLayout({
   children,
@@ -32,11 +38,11 @@ export default async function RootLayout({
     <AppRouterCacheProvider>
         <ThemeProvider theme={theme}>
             <Navbar session={session}/>
-            <Container maxWidth="xl" sx={{display: {xs: 'flex', lg: 'none'},}}>
+            <Container maxWidth="xl" sx={{display: {xs: 'inherit', lg: 'none'},}}>
                 <Typography variant="h6" textAlign="center">The I.D.S. is not made for smaller screen sizes. Please
                     increase your screen size to access the IDS.</Typography>
             </Container>
-            <Container maxWidth="xl" sx={{display: {xs: 'none', lg: 'flex'},}}>
+            <Container maxWidth="xl" sx={{display: {xs: 'none', lg: 'inherit'},}}>
                 {children}
             </Container>
             <ToastContainer theme="dark"/>

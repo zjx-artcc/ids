@@ -3,20 +3,20 @@ import React, {useEffect, useState} from 'react';
 import {DefaultRadarConsolidation, Radar, RadarConsolidation, RadarSector, User} from "@prisma/client";
 import {
     createConsolidation,
+    deleteConsolidation,
     fetchAllConsolidations,
-    updateConsolidation,
-    deleteConsolidation
+    updateConsolidation
 } from "@/actions/radarConsolidation";
 import {
+    Autocomplete,
     Box,
+    Button,
     Card,
     CardContent,
-    Typography,
-    Autocomplete,
-    TextField,
-    Button,
+    CircularProgress,
     Divider,
-    CircularProgress
+    TextField,
+    Typography
 } from "@mui/material";
 import {fetchAllRadarSectors} from "@/actions/radarSector";
 import {toast} from "react-toastify";
@@ -117,6 +117,11 @@ export default function Consolidation() {
             <Card sx={{mb: 2}}>
                 <CardContent>
                     <Typography variant="h6">Active Radar Consolidations</Typography>
+                    <Button variant="contained" size="small"
+                            onClick={() => fetchAllConsolidations().then(setAllRadarConsolidations)} sx={{mt: 1,}}>Refresh
+                        Consolidations</Button>
+                    <Typography variant="subtitle1" gutterBottom>Use this if consolidations have changed while this tab
+                        was open.</Typography>
                     {(!allRadarConsolidations || !allRadarSectors) && <CircularProgress/>}
                     {allRadarConsolidations?.map((consolidation, index) => (
                         <Box key={index} sx={{mb: 2}}>
@@ -162,12 +167,12 @@ export default function Consolidation() {
                                         <Typography key={index} variant="body2">{sector.identifier}</Typography>
                                     ))}
                                     <Box sx={{mt: 1,}}>
-                                        <Button variant="contained" size="small" startIcon={<Edit/>}
+                                        <Button variant="outlined" color="inherit" size="small" startIcon={<Edit/>}
                                                 onClick={() => handleEditToggle(consolidation.id, consolidation)}
                                                 sx={{mr: 2}}>
                                             Edit
                                         </Button>
-                                        <Button variant="contained" size="small" startIcon={<Delete/>}
+                                        <Button variant="outlined" color="inherit" size="small" startIcon={<Delete/>}
                                                 onClick={() => handleDelete(consolidation.id)}>
                                             Delete/Offline
                                         </Button>

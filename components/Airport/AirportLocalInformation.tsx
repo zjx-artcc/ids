@@ -34,6 +34,11 @@ export default function AirportLocalInformation({airport, small,}: { airport: Ai
             setLocalSplit(data);
             toast.info(`${airport.icao} local split has been updated.`);
         });
+
+        return () => {
+            socket.off('vatsim-data');
+            socket.off(`${airport.facilityId}-lcl-split`);
+        };
     }, [router, airport]);
 
     if (small) {

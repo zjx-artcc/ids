@@ -2,6 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import prisma from "@/lib/db";
 import {AtisUpdate} from "@/types";
 import {Prisma} from "@prisma/client";
+import {revalidatePath} from "next/cache";
 import AirportRunwayUpdateInput = Prisma.AirportRunwayUpdateInput;
 
 export async function POST(req: NextRequest) {
@@ -22,12 +23,15 @@ export async function POST(req: NextRequest) {
                     runway: true,
                 },
             },
+            airport: true,
         }
     });
 
     if (!flowPreset) {
         return NextResponse.json(false);
     }
+
+    const newRunways = [];
 
     for (const runway of flowPreset?.runways) {
         const updateData: AirportRunwayUpdateInput = {};
@@ -40,14 +44,34 @@ export async function POST(req: NextRequest) {
             updateData.inUseApproachTypes = runway.approachTypes;
         }
 
-
         await prisma.airportRunway.update({
+            where: {
+                id: runway.runway.id,
+            },
+            data: {
+                inUseDepartureTypes: {
+                    set: [],
+                },
+                inUseApproachTypes: {
+                    set: [],
+                },
+            },
+        });
+
+        const r = await prisma.airportRunway.update({
             where: {
                 id: runway.runway.id,
             },
             data: updateData,
         });
+
+        newRunways.push(r);
     }
 
-    return NextResponse.json(true);
+    revalidatePath(',', "layout");
+
+    return NextResponse.json({
+        facilityId: flowPreset.airport.facilityId,
+        runways: newRunways,
+    });
 }

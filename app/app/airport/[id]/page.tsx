@@ -11,6 +11,26 @@ import AirportRadarInformation from "@/components/Airport/AirportRadarInformatio
 import AirportCharts from "@/components/Airport/AirportCharts";
 import ButtonsTray from "@/components/Tray/ButtonsTray";
 import Viewer from "@/components/Viewer/Viewer";
+import {Metadata} from "next";
+
+export async function generateMetadata(
+    {params}: { params: { id: string } },
+): Promise<Metadata> {
+    const {id} = params;
+
+    const airport = await prisma.airport.findUnique({
+        where: {
+            facilityId: id,
+        },
+        select: {
+            facilityId: true,
+        },
+    });
+
+    return {
+        title: airport?.facilityId || 'UNKNOWN',
+    }
+}
 
 export default async function Page({params}: { params: { id: string } }) {
 

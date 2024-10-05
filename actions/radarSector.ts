@@ -119,6 +119,11 @@ export const createOrUpdateRadarSector = async (formData: FormData) => {
         return {errors: result.error.errors};
     }
 
+    const existingRadarSector = await prisma.radarSector.findUnique({
+        where: {id: result.data.id},
+        include: {borderingSectors: true},
+    });
+
     const radarSector = await prisma.radarSector.upsert({
         create: {
             identifier: result.data.identifier,
@@ -142,6 +147,39 @@ export const createOrUpdateRadarSector = async (formData: FormData) => {
             radar: true,
         },
     });
+
+    // Update bordering sectors in both directions
+    await prisma.$transaction(
+        result.data.borderingSectors.map((borderingSectorId) =>
+            prisma.radarSector.update({
+                where: {id: borderingSectorId},
+                data: {
+                    borderingSectors: {
+                        connect: {id: radarSector.id},
+                    },
+                },
+            })
+        )
+    );
+
+    // Remove the sector from previously bordering sectors that are no longer bordering
+    if (existingRadarSector) {
+        const removedBorderingSectors = existingRadarSector.borderingSectors
+            .filter(sector => !result.data.borderingSectors.includes(sector.id));
+
+        await prisma.$transaction(
+            removedBorderingSectors.map((borderingSector) =>
+                prisma.radarSector.update({
+                    where: {id: borderingSector.id},
+                    data: {
+                        borderingSectors: {
+                            disconnect: {id: radarSector.id},
+                        },
+                    },
+                })
+            )
+        );
+    }
 
     revalidatePath(`/admin/radars/${radarSector.radar.id}/sectors`);
     return {radarSector};
