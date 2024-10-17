@@ -22,7 +22,7 @@ export default function RadarBorderingSectorsGridItem({user, radar}: { user: Use
         return () => {
             socket.off('radar-consolidation');
         };
-    }, []);
+    }, [radar, user]);
 
     return (
         <Grid2 size={4} height={250} sx={{border: 1,}}>
