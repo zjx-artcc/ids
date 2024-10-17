@@ -38,8 +38,7 @@ export default function RadarBorderingSectorsGridItem({user, radar}: { user: Use
                             variant="h6" color="gold">{sector.sector.radarId !== radar.id ? `${sector.sector.radar.identifier} - ${sector.sector.identifier}` : sector.sector.identifier}</Typography>
                         {sector.status === "open" && <Typography variant="subtitle2" color="lightgreen">OPEN
                             - {sector.sector.frequency}</Typography>}
-                        {sector.status === "consolidated" && <Typography variant="subtitle2" color="lightgray">CONSOLIDATED
-                            TO {sector.consolidatedTo?.radarId !== radar.id ? `${sector.consolidatedTo?.radar.identifier} - ${sector.consolidatedTo?.identifier}` : sector.consolidatedTo?.identifier} @ {sector.consolidatedTo?.frequency}</Typography>}
+                        {sector.status === "consolidated" && <Typography variant="subtitle2" color="lightgray">{sector.consolidatedTo?.radarId !== radar.id ? `${sector.consolidatedTo?.radar.identifier} - ${sector.consolidatedTo?.identifier}` : sector.consolidatedTo?.identifier} @ {sector.consolidatedTo?.frequency}</Typography>}
                         {sector.status === "closed" && <Typography variant="subtitle2" color="red">CLOSED</Typography>}
                     </Grid2>
                 ))}
