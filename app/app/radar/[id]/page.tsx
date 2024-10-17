@@ -11,6 +11,8 @@ import RadarBorderingSectorsGridItem from "@/components/Radar/RadarBorderingSect
 
 import RadarChartSelector from "@/components/Radar/RadarChartSelector";
 import {Metadata} from "next";
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/auth/auth";
 
 export async function generateMetadata(
     {params}: { params: { id: string } },
@@ -56,14 +58,16 @@ export default async function Page({params}: { params: { id: string } }) {
         notFound();
     }
 
-    return (
+    const session = await getServerSession(authOptions);
+
+    return session?.user && (
         <Grid2 container columns={12}>
             <Grid2 size={8} height={250} sx={{border: 1,}}>
                 {radar.connectedAirports.map((airport) => (
                     <AirportInformationSmall key={airport.id} airport={airport} runways={airport.runways}/>
                 ))}
             </Grid2>
-            <RadarBorderingSectorsGridItem radar={radar}/>
+            <RadarBorderingSectorsGridItem user={session.user} radar={radar}/>
             <RadarChartSelector airports={radar.connectedAirports}/>
             <TmuGridItem facility={radar.facility}/>
             <NotamInformation facility={radar.facility} initialNotams={radar.notams} radar/>

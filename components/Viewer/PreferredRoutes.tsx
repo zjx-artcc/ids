@@ -18,6 +18,14 @@ export default function PreferredRoutes({startAirport}: { startAirport?: string,
     const [routes, setRoutes] = useState<PreferredRoute[]>();
 
     const submit = async (origin: string, dest?: string) => {
+        if (origin.length === 4 && origin.toUpperCase().startsWith('K')) {
+            origin = origin.slice(1);
+        }
+
+        if (dest && dest.length === 4 && dest.toUpperCase().startsWith('K')) {
+            dest = dest.slice(1);
+        }
+
         const data = await getRoutes(origin, dest);
         setRoutes(data);
     }
