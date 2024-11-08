@@ -13,7 +13,7 @@ function PrdForm({startAirport, onSubmit}: {
     return (
         <form onSubmit={(e) => {
             e.preventDefault();
-            onSubmit(origin, dest)
+            onSubmit(origin, dest).then();
         }}>
             <Stack direction="row" spacing={4}>
                 <TextField

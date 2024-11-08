@@ -40,7 +40,7 @@ export default async function RootLayout({
             <Navbar session={session}/>
             <Container maxWidth="xl" sx={{display: {xs: 'inherit', lg: 'none'},}}>
                 <Typography variant="h6" textAlign="center">The I.D.S. is not made for smaller screen sizes. Please
-                    increase your screen size to access the IDS.</Typography>
+                    increase your screen size or zoom out to access the IDS.</Typography>
             </Container>
             <Container maxWidth="xl" sx={{display: {xs: 'none', lg: 'inherit'},}}>
                 {children}

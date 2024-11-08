@@ -1,7 +1,6 @@
 'use server';
 import {Radar, RadarSector} from "@prisma/client";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
+import {User} from "next-auth";
 import prisma from "@/lib/db";
 
 export type RadarSectorWithRadar = RadarSector & {
@@ -14,16 +13,11 @@ export type BorderingSector = {
     consolidatedTo?: RadarSectorWithRadar;
 }
 
-export const fetchBorderingSectors = async (): Promise<BorderingSector[]> => {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-        return [];
-    }
+export const fetchBorderingSectors = async (user: User, thisRadar: Radar): Promise<BorderingSector[]> => {
 
     const radarConsolidation = await prisma.radarConsolidation.findFirst({
         where: {
-            userId: session.user.id,
+            userId: user.id,
         },
         include: {
             primarySector: {
@@ -50,6 +44,11 @@ export const fetchBorderingSectors = async (): Promise<BorderingSector[]> => {
     });
 
     if (!radarConsolidation) {
+        return [];
+    }
+
+    // check if user is working this radar as a primary sector
+    if (radarConsolidation.primarySector.radarId !== thisRadar.id) {
         return [];
     }
 
