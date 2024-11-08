@@ -4,7 +4,8 @@ import {notFound} from "next/navigation";
 import {Card, CardContent, Typography} from "@mui/material";
 import RadarSectorForm from "@/components/Admin/RadarSector/RadarSectorForm";
 
-export default async function Page({params}: { params: { id: string, sectorId: string } }) {
+export default async function Page(props: { params: Promise<{ id: string, sectorId: string }> }) {
+    const params = await props.params;
 
     const {id, sectorId} = params;
 

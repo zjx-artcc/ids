@@ -4,7 +4,8 @@ import {Typography} from "@mui/material";
 import AirportForm from "@/components/Admin/Airport/AirportForm";
 import {notFound} from "next/navigation";
 
-export default async function Page({params}: { params: { id: string } }) {
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
 
     const {id} = params;
 

@@ -4,7 +4,8 @@ import {Typography} from "@mui/material";
 import {notFound} from "next/navigation";
 import FlowPresetForm from "@/components/Admin/FlowPreset/FlowPresetForm";
 
-export default async function Page({params}: { params: { icao: string } }) {
+export default async function Page(props: { params: Promise<{ icao: string }> }) {
+    const params = await props.params;
 
     const {icao} = params;
 

@@ -14,9 +14,9 @@ import Viewer from "@/components/Viewer/Viewer";
 import {Metadata} from "next";
 
 export async function generateMetadata(
-    {params}: { params: { id: string } },
+    {params}: { params: Promise<{ id: string }> },
 ): Promise<Metadata> {
-    const {id} = params;
+    const {id} = await params;
 
     const airport = await prisma.airport.findUnique({
         where: {
@@ -32,11 +32,11 @@ export async function generateMetadata(
     }
 }
 
-export default async function Page({params}: { params: { id: string } }) {
+export default async function Page({params}: { params: Promise<{ id: string }> }) {
 
     const airport = await prisma.airport.findUnique({
         where: {
-            facilityId: params.id,
+            facilityId: (await params).id,
         },
         include: {
             facility: true,

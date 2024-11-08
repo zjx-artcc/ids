@@ -12,9 +12,8 @@ import RadarBorderingSectorsGridItem from "@/components/Radar/RadarBorderingSect
 import RadarChartSelector from "@/components/Radar/RadarChartSelector";
 import {Metadata} from "next";
 
-export async function generateMetadata(
-    {params}: { params: { id: string } },
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ id: string }> }): Promise<Metadata> {
+    const params = await props.params;
     const {id} = params;
 
     const airport = await prisma.radar.findUnique({
@@ -31,7 +30,8 @@ export async function generateMetadata(
     }
 }
 
-export default async function Page({params}: { params: { id: string } }) {
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
 
     const {id} = params;
 

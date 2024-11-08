@@ -6,7 +6,8 @@ import RadarSectorTable from "@/components/Admin/RadarSector/RadarSectorTable";
 import Link from "next/link";
 import {Add} from "@mui/icons-material";
 
-export default async function Page({params}: { params: { id: string } }) {
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
 
     const {id} = params;
 
