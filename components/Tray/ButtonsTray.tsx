@@ -18,7 +18,7 @@ export default function ButtonsTray({airport, radar,}: { airport?: Airport, rada
             <Typography variant="h6">VIEWER CTL</Typography>
             <Box height={250} sx={{overflow: 'auto',}}>
                 <ButtonGroup size="small" variant="contained" disableElevation sx={{flexWrap: 'wrap', gap: 1,}}>
-                    <Link href={redirectToViewer('wx')}>
+                    <Link href={redirectToViewer('wx')} style={{color: 'inherit',}}>
                         <Button color="inherit">WX</Button>
                     </Link>
                     <Link href={redirectToViewer('prd', new URLSearchParams({startAirport: airport?.iata || '',}))}>
@@ -61,7 +61,8 @@ export default function ButtonsTray({airport, radar,}: { airport?: Airport, rada
                         <Button variant="outlined" color="inherit" size="small">VZDC WEBSITE</Button>
                     </Link>
                 </ButtonGroup>
-
+                <Typography sx={{mt: 4,}}>&copy; 2024 vZDC</Typography>
+                <Typography variant="subtitle2" color="red">NOT FOR REAL WORLD USE</Typography>
             </Box>
         </Grid2>
     );

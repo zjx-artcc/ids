@@ -1,6 +1,12 @@
+import config from './package.json' with {type: 'json'};
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'standalone',
+    publicRuntimeConfig: {
+        version: config.version,
+        author: config.author,
+    },
     images: {
         remotePatterns: [
             {
