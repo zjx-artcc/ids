@@ -63,6 +63,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma/ ./prisma/
 
+RUN find /app -name ".env" -type f -delete
+
 USER nextjs
 
 EXPOSE 3000
