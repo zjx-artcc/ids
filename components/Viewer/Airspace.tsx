@@ -85,7 +85,7 @@ export default function Airspace() {
                 alignItems: 'center'
             }}>
                 {loading ? <CircularProgress/> : selectedAirspace &&
-                    <Image src={(url || null) as any} alt={selectedAirspace.name} fill style={{objectFit: 'contain'}}/>}
+                    <Image src={url || ''} alt={selectedAirspace.name} fill style={{objectFit: 'contain'}}/>}
             </Box>
         </Stack>
     );

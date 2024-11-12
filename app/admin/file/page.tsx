@@ -32,7 +32,8 @@ export default function Page() {
                 }).catch(() => {
                     toast.error("Error importing configuration, make sure it is unchanged from the export.");
                 });
-            } catch (error) {
+            } catch (e) {
+                console.log(e);
                 toast.error("Error parsing JSON file");
             }
         };
