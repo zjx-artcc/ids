@@ -13,13 +13,13 @@ export default function AirportTable() {
     const columns: GridColDef[] = [
         {
             field: 'icao',
-            headerName: 'ICAO',
+            headerName: 'ICAO (Facility ID)',
             flex: 1,
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
             field: 'iata',
-            headerName: 'IATA (Facility ID)',
+            headerName: 'IATA',
             flex: 1,
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },

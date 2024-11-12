@@ -178,9 +178,9 @@ export const createOrUpdateAirport = async (formData: FormData) => {
             sopLink: result.data.sopLink,
             facility: {
                 connectOrCreate: {
-                    where: {id: result.data.iata},
+                    where: {id: result.data.icao},
                     create: {
-                        id: result.data.iata,
+                        id: result.data.icao,
                     }
                 },
             },
