@@ -55,7 +55,7 @@ export default function AirportCharts({icao}: { icao: string, }) {
     };
 
     return (
-        <Box height={250} sx={{overflow: 'auto',}}>
+        <Box height={250} sx={{overflow: 'auto'}}>
             {!charts && <CircularProgress/>}
             {Object.entries(chartsGroupedByCode || {}).map(([code, charts]) => (
                 <ButtonGroup
@@ -63,7 +63,18 @@ export default function AirportCharts({icao}: { icao: string, }) {
                     variant="outlined"
                     size="small"
                     color={getChartColor(code)}
-                    sx={{mb: 2, flexWrap: 'wrap'}}
+                    sx={{mb: 2, flexWrap: 'wrap', 
+                        '& .MuiButtonGroup-middleButton,.MuiButtonGroup-firstButton, .MuiButtonGroup-lastButton': {
+                            borderRightColor: "var(--variant-outlinedBorder)",
+                            borderTopRightRadius: "inherit",
+                            borderBottomRightRadius: "inherit",
+                            borderTopLeftRadius: 'inherit',
+                            borderBottomLeftRadius: 'inherit',
+                            marginLeft: 0,
+                            marginBottom: '5px',
+                            marginRight: '5px'
+                        },
+                        marginLeft:'5px'}}
                 >
                     {charts.map((chart) => (
                         <Button key={chart.url} onClick={() => navigateToChart(chart.url)}>{chart.name}</Button>
