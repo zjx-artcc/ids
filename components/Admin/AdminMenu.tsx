@@ -1,7 +1,16 @@
 import {Card, CardContent, List, ListItemButton, ListItemIcon, ListItemText, Typography} from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
-import {AirplanemodeActive, CellTower, FileOpen, GridView, Home, PieChart, Radar} from "@mui/icons-material";
+import {
+    AirplanemodeActive,
+    CellTower,
+    FileOpen,
+    GridView,
+    Home,
+    ImportExport,
+    PieChart,
+    Radar
+} from "@mui/icons-material";
 
 export default function AdminMenu() {
     return (
@@ -63,6 +72,15 @@ export default function AdminMenu() {
                                 <CellTower/>
                             </ListItemIcon>
                             <ListItemText primary="T.M.U. Notices"/>
+                        </ListItemButton>
+                    </Link>
+
+                    <Link href="/admin/file" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <ImportExport/>
+                            </ListItemIcon>
+                            <ListItemText primary="Import/Export"/>
                         </ListItemButton>
                     </Link>
                 </List>

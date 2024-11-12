@@ -103,7 +103,7 @@ export const createConsolidation = async (primarySectorId: string, secondarySect
 }
 
 export const updateConsolidation = async (id: string, primarySectorId: string, secondarySectorIds: string[]) => {
-    // Fetch existing consolidations
+    // Fetch existing consolidations excluding the current one
     const existingConsolidations = await prisma.radarConsolidation.findMany({
         where: {
             NOT: {
@@ -116,22 +116,28 @@ export const updateConsolidation = async (id: string, primarySectorId: string, s
         },
     });
 
-
     // Check if the primary sector is already in a consolidation
     const isPrimaryInUse = existingConsolidations.some(consolidation => consolidation.primarySectorId === primarySectorId);
     if (isPrimaryInUse) {
         return {error: "Primary sector is already in a consolidation"};
     }
 
-    // Check if any of the secondary sectors are already in a consolidation
-    const isSecondaryInUse = existingConsolidations.some(consolidation =>
-        consolidation.secondarySectors.some(sector => secondarySectorIds.includes(sector.id) && consolidation.id !== id)
-    );
-    if (isSecondaryInUse) {
-        return {error: "One or more secondary sectors are already in a consolidation"};
+    // Remove secondary sectors from other consolidations if they are being "stolen"
+    for (const consolidation of existingConsolidations) {
+        const secondarySectorsToRemove = consolidation.secondarySectors.filter(sector => secondarySectorIds.includes(sector.id));
+        if (secondarySectorsToRemove.length > 0) {
+            await prisma.radarConsolidation.update({
+                where: {id: consolidation.id},
+                data: {
+                    secondarySectors: {
+                        disconnect: secondarySectorsToRemove.map(sector => ({id: sector.id})),
+                    },
+                },
+            });
+        }
     }
 
-    // Update the consolidation
+    // Update the consolidation with the new primary and secondary sectors
     const consolidation = await prisma.radarConsolidation.update({
         where: {
             id,

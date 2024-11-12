@@ -21,6 +21,7 @@
     "@mui/material-nextjs": "^6.1.6",
     "@mui/x-data-grid": "^7.22.2",
     "@prisma/client": "^5.22.0",
+    "file-saver": "^2.0.5",
     "next": "15.0.3",
     "next-auth": "4.24.10",
     "react": "19.0.0-rc-66855b96-20241106",
@@ -32,6 +33,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^22",
     "@types/react": "npm:types-react@19.0.0-rc.1",
     "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",

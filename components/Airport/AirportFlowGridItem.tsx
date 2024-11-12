@@ -42,16 +42,16 @@ export default function AirportFlowGridItem({airport, runways, small}: {
 
     return (
         <Grid2 size={3} sx={{border: 1,}}>
-            <Stack direction="column" spacing={1} sx={{color: 'yellow'}}>
+            <Stack direction="column" spacing={1} sx={{color: 'yellow', height: 200, overflow: 'auto',}}>
                 {arrivalRunways.map(runway => (
-                    <Typography key={runway.id} variant="h4">
+                    <Typography key={runway.id} variant={arrivalRunways.length > 2 ? 'h6' : 'h4'}>
                         {runway.inUseApproachTypes.join('/')} <b>{runway.runwayIdentifier}</b>
                     </Typography>
                 ))}
                 <Divider/>
                 {departureRunways.map(runway => (
-                    <Typography key={runway.id} variant="h4" color="purple">
-                        DEPS {runway.inUseDepartureTypes.join('/')} <b>{runway.runwayIdentifier}</b>
+                    <Typography key={runway.id} variant={departureRunways.length > 2 ? 'h6' : 'h4'} color="purple">
+                        {runway.inUseDepartureTypes.join('/')} <b>{runway.runwayIdentifier}</b>
                     </Typography>
                 ))}
             </Stack>
