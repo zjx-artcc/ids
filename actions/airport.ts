@@ -5,6 +5,8 @@ import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 import {AirportRunway, Prisma} from "@prisma/client";
+import {log} from "@/actions/log";
+import {OrderItem} from "@/components/Admin/Order/OrderList";
 
 export const fetchAllAirports = async () => {
     return prisma.airport.findMany({
@@ -17,7 +19,7 @@ export const fetchAllAirports = async () => {
     });
 }
 
-export const updateFlow = async (criteria: {
+export const updateFlow = async (icao: string, criteria: {
     [key: string]: { inUseDepartureTypes: string[], inUseApproachTypes: string[] }
 }) => {
     const airportZ = z.object({
@@ -50,6 +52,8 @@ export const updateFlow = async (criteria: {
         runways.push(savedRunway);
     }
 
+    await log("UPDATE", "FRONTEND_ARP_SET", `Changed flow for ${icao}`);
+
     revalidatePath('/', "layout");
 
     return {runways};
@@ -63,6 +67,8 @@ export const updateLocalSplit = async (airportId: string, localSplit: string[]) 
         },
     });
 
+    await log("UPDATE", "FRONTEND_ARP_SET", `Changed local split for ${airport.icao}`);
+
     revalidatePath('/', "layout");
 
     return {airport};
@@ -75,6 +81,8 @@ export const updateNotams = async (airportId: string, notams: string[]) => {
             notams: {set: notams},
         },
     });
+
+    await log("UPDATE", "FRONTEND_ARP_SET", `Changed NOTAMs for ${airport.icao}`);
 
     revalidatePath('/', "layout");
 
@@ -214,7 +222,32 @@ export const createOrUpdateAirport = async (formData: FormData) => {
         },
     });
 
+    if (result.data.id) {
+        await log("UPDATE", "AIRPORT", `Updated airport ${result.data.icao}`);
+    } else {
+        await log("CREATE", "AIRPORT", `Created airport ${result.data.icao}`);
+    }
+
     revalidatePath("/admin/airports");
 
     return {airport};
+}
+
+export const updateAirportOrder = async (items: OrderItem[]) => {
+
+    for (const item of items) {
+        await prisma.airport.update({
+            where: {id: item.id},
+            data: {
+                facility: {
+                    update: {
+                        order: item.order,
+                    },
+                },
+            },
+        });
+    }
+
+    await log("UPDATE", "AIRPORT", `Updated airport order`);
+
 }

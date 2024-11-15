@@ -5,6 +5,8 @@ import {Facility, Prisma} from "@prisma/client";
 import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";
 import {z} from "zod";
+import {log} from "@/actions/log";
+import {OrderItem} from "@/components/Admin/Order/OrderList";
 
 export const fetchSingleTmu = async (facility: Facility) => {
     return prisma.tmuNotice.findMany({
@@ -14,6 +16,9 @@ export const fetchSingleTmu = async (facility: Facility) => {
                     id: facility.id,
                 },
             },
+        },
+        orderBy: {
+            order: 'asc',
         },
     });
 }
@@ -111,14 +116,37 @@ export const createOrUpdateTmu = async (formData: FormData) => {
         },
     });
 
+    if (result.data.id) {
+        await log("UPDATE", "TMU_NOTICE", `Updated TMU Notice ${tmu.message}`);
+    } else {
+        await log("CREATE", "TMU_NOTICE", `Created TMU Notice ${tmu.message}`);
+    }
+
     revalidatePath('/', "layout");
     return {tmu};
 }
 
 export const deleteTmu = async (id: string) => {
-    await prisma.tmuNotice.delete({
+    const tmu = await prisma.tmuNotice.delete({
         where: {id},
     });
 
+    await log("DELETE", "TMU_NOTICE", `Deleted TMU Notice ${tmu.message}`);
+
     revalidatePath('/', "layout");
+}
+
+export const updateTmuOrder = async (items: OrderItem[]) => {
+
+    for (const item of items) {
+        await prisma.tmuNotice.update({
+            where: {id: item.id},
+            data: {
+                order: item.order,
+            },
+        });
+    }
+
+    await log("UPDATE", "TMU_NOTICE", `Updated TMU order`);
+
 }

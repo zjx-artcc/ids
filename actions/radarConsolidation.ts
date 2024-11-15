@@ -4,9 +4,9 @@ import prisma from "@/lib/db";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {revalidatePath} from "next/cache";
+import {log} from "@/actions/log";
 
 export const fetchAllConsolidations = async () => {
-    // await prisma.radarConsolidation.deleteMany();
     return prisma.radarConsolidation.findMany({
         include: {
             primarySector: {
@@ -97,6 +97,8 @@ export const createConsolidation = async (primarySectorId: string, secondarySect
         },
     });
 
+    await log("CREATE", "RADAR_CONSOLIDATION", `Created radar consolidation with primary sector ${consolidation.primarySector.identifier} and secondary sectors ${consolidation.secondarySectors.map(sector => sector.identifier).join(", ")}`);
+
     revalidatePath('/', "layout");
 
     return {consolidation};
@@ -163,6 +165,8 @@ export const updateConsolidation = async (id: string, primarySectorId: string, s
         },
     });
 
+    await log("UPDATE", "RADAR_CONSOLIDATION", `Updated radar consolidation with primary sector ${consolidation.primarySector.identifier} and secondary sectors ${consolidation.secondarySectors.map(sector => sector.identifier).join(", ")}`);
+
     revalidatePath('/', "layout");
 
     return {consolidation};
@@ -187,6 +191,8 @@ export const deleteConsolidation = async (id: string) => {
             user: true,
         },
     });
+
+    await log("DELETE", "RADAR_CONSOLIDATION", `Deleted radar consolidation with primary sector ${consolidation.primarySector.identifier} and secondary sectors ${consolidation.secondarySectors.map(sector => sector.identifier).join(", ")}`);
 
     revalidatePath('/', "layout");
 

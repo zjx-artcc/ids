@@ -1,4 +1,5 @@
 import prisma from "@/lib/db";
+import {log} from "@/actions/log";
 
 export async function GET() {
 
@@ -42,6 +43,8 @@ export async function GET() {
 
     const airspaceDiagrams = await prisma.airspaceDiagram.findMany();
 
+    await log("UPDATE", "EXPORT", "Config file exported successfully");
+    
     return Response.json({
         airports,
         radars,

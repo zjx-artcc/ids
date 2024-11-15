@@ -21,7 +21,7 @@ export default async function Home() {
             },
         },
         orderBy: {
-            id: 'asc',
+            order: 'asc',
         },
     });
 
@@ -32,7 +32,7 @@ export default async function Home() {
             },
         },
         orderBy: {
-            id: 'asc',
+            order: 'asc',
         },
     });
 
@@ -43,7 +43,7 @@ export default async function Home() {
             },
         },
         orderBy: {
-            id: 'asc',
+            order: 'asc',
         },
     });
 
@@ -53,10 +53,6 @@ export default async function Home() {
                 <Typography variant="h5" textAlign="center" gutterBottom>Facility Picker (select one)</Typography>
                 <List
                     sx={{
-                        width: '100%',
-                        position: 'relative',
-                        overflow: 'auto',
-                        maxHeight: 500,
                         '& ul': {padding: 0},
                     }}
                     subheader={<li/>}

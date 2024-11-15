@@ -5,6 +5,7 @@ import {Prisma} from "@prisma/client";
 import prisma from "@/lib/db";
 import {z} from "zod";
 import {revalidatePath} from "next/cache";
+import {log} from "@/actions/log";
 
 export const fetchAllDefaultRadarConsolidations = async () => {
     return prisma.defaultRadarConsolidation.findMany({
@@ -188,17 +189,25 @@ export const createOrUpdateDefaultRadarConsolidation = async (formData: FormData
         },
     });
 
+    if (result.data.id) {
+        await log("UPDATE", "DEFAULT_RADAR_CONSOLIDATION", `Updated default radar consolidation ${consolidation.name}`);
+    } else {
+        await log("CREATE", "DEFAULT_RADAR_CONSOLIDATION", `Created default radar consolidation ${consolidation.name}`);
+    }
+
     revalidatePath('/admin/radar-consolidations');
 
     return {consolidation};
 }
 
 export const deleteDefaultRadarConsolidation = async (id: string) => {
-    await prisma.defaultRadarConsolidation.delete({
+    const drc = await prisma.defaultRadarConsolidation.delete({
         where: {
             id,
         },
     });
+
+    await log("DELETE", "DEFAULT_RADAR_CONSOLIDATION", `Deleted default radar consolidation ${drc.name}`);
 
     revalidatePath('/admin/radar-consolidations');
 }

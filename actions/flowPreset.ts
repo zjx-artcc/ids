@@ -5,6 +5,7 @@ import {FlowPresetAtisType, Prisma} from "@prisma/client";
 import prisma from "@/lib/db";
 import {z} from "zod";
 import {revalidatePath} from "next/cache";
+import {log} from "@/actions/log";
 
 export const fetchFlowPresets = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
     const orderBy: Prisma.FlowPresetOrderByWithRelationInput = {};
@@ -132,10 +133,19 @@ export const createOrUpdateFlowPreset = async (formData: FormData) => {
                 })),
             },
         },
+        include: {
+            airport: true,
+        },
         where: {
             id: result.data.id || '',
         },
     });
+
+    if (result.data.id) {
+        await log("UPDATE", "FLOW_PRESET", `Updated ${flowPreset.airport.icao} flow preset ${flowPreset.presetName}`);
+    } else {
+        await log("CREATE", "FLOW_PRESET", `Created ${flowPreset.airport.icao} flow preset ${flowPreset.presetName}`);
+    }
 
     revalidatePath('/', "layout");
 

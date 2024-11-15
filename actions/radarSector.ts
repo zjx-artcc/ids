@@ -4,6 +4,7 @@ import {revalidatePath} from "next/cache";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 import {Prisma, Radar} from "@prisma/client";
 import {z} from "zod";
+import {log} from "@/actions/log";
 
 export const fetchAllRadarSectors = async () => {
     return prisma.radarSector.findMany({
@@ -181,6 +182,12 @@ export const createOrUpdateRadarSector = async (formData: FormData) => {
         );
     }
 
+    if (result.data.id) {
+        await log("UPDATE", "RADAR_SECTOR", `Updated ${radarSector.radar.facilityId} sector ${radarSector.identifier}`);
+    } else {
+        await log("CREATE", "RADAR_SECTOR", `Created ${radarSector.radar.facilityId} sector ${radarSector.identifier}`);
+    }
+
     revalidatePath(`/admin/radars/${radarSector.radar.id}/sectors`);
     return {radarSector};
 }
@@ -194,6 +201,8 @@ export const deleteRadarSector = async (id: string) => {
             radar: true,
         },
     });
+
+    await log("DELETE", "RADAR_SECTOR", `Deleted ${radarSector.radar.facilityId} sector ${radarSector.identifier}`);
 
     revalidatePath(`/admin/radars/${radarSector.radar.id}/sectors`);
 }

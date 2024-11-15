@@ -11,6 +11,7 @@ import {
     RadarSector
 } from "@prisma/client";
 import prisma from "@/lib/db";
+import {log} from "@/actions/log";
 
 type RadarWithConnectedAirports = Radar & { connectedAirports: { id: string, }[], };
 type RadarSectorWithBorderingSectors = RadarSector & { borderingSectors: { id: string, }[], };
@@ -127,4 +128,6 @@ export const importConfigFile = async (config: ConfigFile) => {
             },
         });
     }
+
+    await log("UPDATE", "IMPORT", "Config file imported successfully");
 }

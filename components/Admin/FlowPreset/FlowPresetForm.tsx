@@ -3,11 +3,12 @@ import React, {useState} from 'react';
 import {AirportRunway, FlowPreset, FlowPresetAtisType, FlowPresetRunway} from "@prisma/client";
 import {Box, FormControl, Grid2, IconButton, InputLabel, MenuItem, Select, TextField, Typography} from "@mui/material";
 import FlowPresetRunwayForm from "@/components/Admin/FlowPreset/FlowPresetRunwayForm";
-import {Delete} from "@mui/icons-material";
+import {Delete, Edit} from "@mui/icons-material";
 import FormSaveButton from "@/components/Admin/Form/FormSaveButton";
 import {createOrUpdateFlowPreset} from "@/actions/flowPreset";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import EditFlowPresetRunwayDialog from '@/components/Admin/FlowPreset/EditFlowPresetRunwayDialog';
 
 export default function FlowPresetForm({icao, preset, currentRunways, allRunways,}: {
     icao: string,
@@ -18,6 +19,8 @@ export default function FlowPresetForm({icao, preset, currentRunways, allRunways
 
     const [runways, setRunways] = useState<FlowPresetRunway[]>(currentRunways || []);
     const [atisType, setAtisType] = useState<FlowPresetAtisType>("COMBINED");
+    const [editRunway, setEditRunway] = useState<FlowPresetRunway | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const router = useRouter();
 
     const handleSubmit = async (formData: FormData) => {
@@ -37,8 +40,16 @@ export default function FlowPresetForm({icao, preset, currentRunways, allRunways
             toast.success(`Created flow preset`);
             router.push('/admin/flow-presets');
         }
-
     }
+
+    const handleEditRunway = (runway: FlowPresetRunway) => {
+        setEditRunway(runway);
+        setIsEditDialogOpen(true);
+    };
+
+    const handleSaveRunway = (updatedRunway: FlowPresetRunway) => {
+        setRunways(runways.map((runway) => runway.id === updatedRunway.id ? updatedRunway : runway));
+    };
 
     return (
         <form action={handleSubmit}>
@@ -73,9 +84,12 @@ export default function FlowPresetForm({icao, preset, currentRunways, allRunways
                     {runways.length === 0 && <Typography>No runways have been added yet.</Typography>}
                     {runways.map((runway, index) => (
                         <Box key={index} sx={{mb: 1,}}>
-                            <Typography>{runway.id} <IconButton onClick={() => {
-                                setRunways(runways.filter((r) => r.id !== runway.id));
-                            }}><Delete/></IconButton></Typography>
+                            <Typography>{runway.id}
+                                <IconButton onClick={() => handleEditRunway(runway)}><Edit/></IconButton>
+                                <IconButton onClick={() => {
+                                    setRunways(runways.filter((r) => r.id !== runway.id));
+                                }}><Delete/></IconButton>
+                            </Typography>
                             <Typography variant="subtitle2">Preset Departure
                                 Types: {runway.departureTypes.join(', ')}</Typography>
                             <Typography variant="subtitle2">Preset Approach
@@ -91,6 +105,13 @@ export default function FlowPresetForm({icao, preset, currentRunways, allRunways
                     <FormSaveButton/>
                 </Grid2>
             </Grid2>
+            <EditFlowPresetRunwayDialog
+                open={isEditDialogOpen}
+                onClose={() => setIsEditDialogOpen(false)}
+                onSave={handleSaveRunway}
+                runway={editRunway}
+                allRunways={allRunways}
+            />
         </form>
     );
 }

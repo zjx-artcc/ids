@@ -6,6 +6,7 @@ import {Prisma} from "@prisma/client";
 import {z} from "zod";
 import {UTApi} from "uploadthing/server";
 import {revalidatePath} from "next/cache";
+import {log} from "@/actions/log";
 
 const MAX_FILE_SIZE = 1024 * 1024 * 4;
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
@@ -163,9 +164,33 @@ export const createOrUpdateAirspaceDiagram = async (formData: FormData) => {
         where: {
             id: result.data.id,
         },
+        include: {
+            airport: true,
+            sector: {
+                include: {
+                    radar: true,
+                },
+            },
+        },
         update: data,
         create: data,
     });
+
+    if (existingDiagram) {
+        if (airspaceDiagram.airport) {
+            await log("UPDATE", "AIRSPACE_DIAGRAM", `Updated airspace diagram: ${airspaceDiagram.name} for airport ${airspaceDiagram.airport.icao}`);
+        } else if (airspaceDiagram.sector) {
+            await log("UPDATE", "AIRSPACE_DIAGRAM", `Updated airspace diagram: ${airspaceDiagram.name} for sector ${airspaceDiagram.sector.radar.facilityId}-${airspaceDiagram.sector.identifier}`);
+        }
+    } else {
+        if (airspaceDiagram.airport) {
+            await log("CREATE", "AIRSPACE_DIAGRAM", `Created airspace diagram: ${airspaceDiagram.name} for airport ${airspaceDiagram.airport.icao}`);
+        } else if (airspaceDiagram.sector) {
+            await log("CREATE", "AIRSPACE_DIAGRAM", `Created airspace diagram: ${airspaceDiagram.name} for sector ${airspaceDiagram.sector.radar.facilityId}-${airspaceDiagram.sector.identifier}`);
+        }
+    }
+
+    revalidatePath('/admin/airspaces');
 
     return {airspaceDiagram};
 }
@@ -175,7 +200,21 @@ export const deleteAirspaceDiagram = async (id: string) => {
         where: {
             id,
         },
+        include: {
+            airport: true,
+            sector: {
+                include: {
+                    radar: true,
+                },
+            },
+        },
     });
+
+    if (airspaceDiagram.airport) {
+        await log("DELETE", "AIRSPACE_DIAGRAM", `Deleted airspace diagram: ${airspaceDiagram.name} for airport ${airspaceDiagram.airport.icao}`);
+    } else if (airspaceDiagram.sector) {
+        await log("DELETE", "AIRSPACE_DIAGRAM", `Deleted airspace diagram: ${airspaceDiagram.name} for sector ${airspaceDiagram.sector.radar.facilityId}-${airspaceDiagram.sector.identifier}`);
+    }
 
     await ut.deleteFiles(airspaceDiagram.key);
 

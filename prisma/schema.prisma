@@ -11,12 +11,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Log {
-  id      String   @id @default(cuid())
-  message String
-  date    DateTime
-}
-
 model Account {
   id                String   @id @default(cuid())
   userId            String
@@ -56,6 +50,8 @@ model User {
   rating        Int
   division      String
 
+  logs Log[]
+
   consolidations RadarConsolidation[]
 
   accounts Account[]
@@ -74,10 +70,12 @@ model TmuNotice {
   id                    String     @id @default(cuid())
   message               String
   broadcastedFacilities Facility[]
+  order                 Int        @default(0)
 }
 
 model Facility {
   id         String      @id @default(cuid())
+  order      Int         @default(0)
   airport    Airport?
   radar      Radar?
   tmuNotices TmuNotice[]
@@ -192,4 +190,38 @@ model AirspaceDiagram {
   airportId String?
   sector    RadarSector? @relation(fields: [sectorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   sectorId  String?
+}
+
+enum LogType {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum LogModel {
+  AIRPORT
+  AIRPORT_RUNWAY
+  FLOW_PRESET
+  FLOW_PRESET_RUNWAY
+  RADAR
+  RADAR_SECTOR
+  RADAR_CONSOLIDATION
+  DEFAULT_RADAR_CONSOLIDATION
+  AIRSPACE_DIAGRAM
+  TMU_NOTICE
+  IMPORT
+  EXPORT
+  FRONTEND_ARP_SET
+  FRONTEND_RDR_SET
+  FRONTEND_RDR_CONSOL
+}
+
+model Log {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  type      LogType
+  model     LogModel
+  message   String
+  timestamp DateTime
+  userId    String
 }

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "TmuNotice"
+    ADD COLUMN "order" INTEGER NOT NULL DEFAULT 0;

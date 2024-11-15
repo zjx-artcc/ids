@@ -1,6 +1,7 @@
 'use server';
 import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";
+import {log} from "@/actions/log";
 
 export const fetchAllFacilities = async () => {
     return prisma.facility.findMany();
@@ -22,13 +23,21 @@ export const getSopLink = async (id: string) => {
 
 export const deleteFacility = async (id: string) => {
 
-    console.log(id);
-
-    await prisma.facility.delete({
+    const f = await prisma.facility.delete({
         where: {
             id,
         },
+        include: {
+            airport: true,
+            radar: true,
+        },
     });
+
+    if (f.airport) {
+        await log("DELETE", "AIRPORT", `Deleted airport ${f.airport.icao}`);
+    } else if (f.radar) {
+        await log("DELETE", "RADAR", `Deleted radar ${f.radar.name}`);
+    }
 
     revalidatePath('/', "layout");
 }

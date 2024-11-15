@@ -8,8 +8,10 @@ import {
     GridView,
     Home,
     ImportExport,
+    ListAlt,
     PieChart,
-    Radar
+    Radar,
+    Reorder
 } from "@mui/icons-material";
 
 export default function AdminMenu() {
@@ -66,6 +68,30 @@ export default function AdminMenu() {
                             <ListItemText primary="Airspace Diagrams"/>
                         </ListItemButton>
                     </Link>
+                    <Link href="/admin/order/airport" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <Reorder/>
+                            </ListItemIcon>
+                            <ListItemText primary="Airport Order"/>
+                        </ListItemButton>
+                    </Link>
+                    <Link href="/admin/order/radar" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <Reorder/>
+                            </ListItemIcon>
+                            <ListItemText primary="Radar Order"/>
+                        </ListItemButton>
+                    </Link>
+                    <Link href="/admin/order/enroute" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <Reorder/>
+                            </ListItemIcon>
+                            <ListItemText primary="Enroute Order"/>
+                        </ListItemButton>
+                    </Link>
                     <Link href="/admin/tmu" style={{textDecoration: 'none', color: 'inherit',}}>
                         <ListItemButton>
                             <ListItemIcon>
@@ -74,13 +100,29 @@ export default function AdminMenu() {
                             <ListItemText primary="T.M.U. Notices"/>
                         </ListItemButton>
                     </Link>
-
+                    <Link href="/admin/order/tmu" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <Reorder/>
+                            </ListItemIcon>
+                            <ListItemText primary="T.M.U. Order"/>
+                        </ListItemButton>
+                    </Link>
                     <Link href="/admin/file" style={{textDecoration: 'none', color: 'inherit',}}>
                         <ListItemButton>
                             <ListItemIcon>
                                 <ImportExport/>
                             </ListItemIcon>
                             <ListItemText primary="Import/Export"/>
+                        </ListItemButton>
+                    </Link>
+
+                    <Link href="/admin/logs" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <ListAlt/>
+                            </ListItemIcon>
+                            <ListItemText primary="Logs"/>
                         </ListItemButton>
                     </Link>
                 </List>

@@ -64,7 +64,7 @@ export default function AirportSettings() {
     };
 
     const handleActivate = async () => {
-        const {runways, errors} = await updateFlow(runwaySettings);
+        const {runways, errors} = await updateFlow(selectedAirport?.icao || '', runwaySettings);
 
         if (errors) {
             toast.error('There was an error updating the flow');

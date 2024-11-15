@@ -4,6 +4,8 @@ import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-gr
 import {Prisma} from "@prisma/client";
 import prisma from "@/lib/db";
 import {z} from "zod";
+import {log} from "@/actions/log";
+import {OrderItem} from "@/components/Admin/Order/OrderList";
 
 export const fetchAllRadars = async () => {
     return prisma.radar.findMany({
@@ -14,7 +16,8 @@ export const fetchAllRadars = async () => {
 }
 
 export const updateRadarSplit = async (radarId: string, radarSplit: string[]) => {
-    return prisma.radar.update({
+
+    const radar = await prisma.radar.update({
         where: {
             id: radarId,
         },
@@ -22,10 +25,14 @@ export const updateRadarSplit = async (radarId: string, radarSplit: string[]) =>
             radarSplit,
         },
     });
+
+    await log("UPDATE", "FRONTEND_RDR_SET", `Radar split updated for ${radar.facilityId}`);
+
+    return radar;
 }
 
 export const updateNotams = async (radarId: string, notams: string[]) => {
-    return prisma.radar.update({
+    const radar = await prisma.radar.update({
         where: {
             id: radarId,
         },
@@ -33,6 +40,10 @@ export const updateNotams = async (radarId: string, notams: string[]) => {
             notams,
         },
     });
+
+    await log("UPDATE", "FRONTEND_RDR_SET", `NOTAMs updated for ${radar.facilityId}`);
+
+    return radar;
 }
 
 export const fetchRadars = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
@@ -183,5 +194,31 @@ export const createOrUpdateRadar = async (formData: FormData) => {
             id: result.data.id || '',
         },
     });
+
+    if (result.data.id) {
+        await log("UPDATE", "RADAR", `Updated radar ${radar.facilityId}`);
+    } else {
+        await log("CREATE", "RADAR", `Created radar ${radar.facilityId}`);
+    }
+
     return {radar};
+}
+
+export const updateRadarOrder = async (items: OrderItem[]) => {
+
+    for (const item of items) {
+        await prisma.radar.update({
+            where: {id: item.id},
+            data: {
+                facility: {
+                    update: {
+                        order: item.order,
+                    },
+                },
+            },
+        });
+    }
+
+    await log("UPDATE", "RADAR", `Updated radar order`);
+
 }
