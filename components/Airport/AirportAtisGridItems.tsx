@@ -141,7 +141,7 @@ export default function AirportAtisGridItems({icao, small}: { icao: string, smal
 }
 
 export const getWindAndAltimeter = (metar: string) => {
-    const wind = metar.match(/(\d{3}|VRB)\d{2}KT/);
+    const wind = metar.match(/(\d{3}|VRB)\d{2}(G\d{2})?KT/);
     const altimeter = metar.match(/A\d{4}/);
 
     return {
