@@ -1,6 +1,6 @@
 import React from 'react';
-import {Button, Stack, Typography} from "@mui/material";
-import {Add} from "@mui/icons-material";
+import {Box, Button, Stack, Typography} from "@mui/material";
+import {Add, Reorder} from "@mui/icons-material";
 import Link from "next/link";
 import AirportTable from "@/components/Admin/Airport/AirportTable";
 
@@ -9,9 +9,15 @@ export default async function Page() {
         <>
             <Stack direction="row" spacing={1} justifyContent="space-between">
                 <Typography variant="h5">Airports</Typography>
-                <Link href="/admin/airports/new">
-                    <Button variant="contained" startIcon={<Add/>}>New Airport</Button>
-                </Link>
+                <Box>
+                    <Link href="/admin/order/airport" style={{color: 'inherit',}}>
+                        <Button variant="outlined" color="inherit" size="small" startIcon={<Reorder/>}
+                                sx={{mr: 1,}}>Order</Button>
+                    </Link>
+                    <Link href="/admin/airports/new">
+                        <Button variant="contained" startIcon={<Add/>}>New Airport</Button>
+                    </Link>
+                </Box>
             </Stack>
             <AirportTable/>
         </>
