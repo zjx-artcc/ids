@@ -48,7 +48,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                     runways: true,
                 },
                 orderBy: {
-                    icao: 'asc',
+                    facility: {
+                        order: 'asc',
+                    },
                 },
             },
         },
