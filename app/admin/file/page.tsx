@@ -1,20 +1,26 @@
 'use client';
 import React, {useState} from 'react';
-import {Box, Button, Card, CardContent, Checkbox, Divider, FormControlLabel, Typography} from "@mui/material";
+import {Box, Card, CardContent, Checkbox, Divider, FormControlLabel, Typography} from "@mui/material";
 import {Download} from "@mui/icons-material";
 import {saveAs} from "file-saver";
 import {toast} from "react-toastify";
-import {ConfigFile, importConfigFile} from "@/actions/config";
+import {importConfigFile} from "@/actions/config";
+import {LoadingButton} from "@mui/lab";
 
 export default function Page() {
 
     const [agree, setAgree] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const downloadExportFile = () => {
-        saveAs('/api/export', `ids-export-${new Date().toUTCString()}.json`);
+        setLoading(true);
+        saveAs('/api/export');
+        setLoading(false);
     }
 
     const submitConfigFile = async (formData: FormData) => {
+
+        setLoading(true);
 
         if ((formData.get('config') as File).size === 0) {
             toast.error("No file selected");
@@ -26,37 +32,43 @@ export default function Page() {
 
         reader.onload = (event) => {
             try {
-                const json = JSON.parse(event.target?.result as string);
-                importConfigFile(json as ConfigFile).then(() => {
+                const zip = new Uint8Array(event.target?.result as ArrayBuffer);
+                console.log(zip);
+                importConfigFile(zip).then(() => {
                     toast.success("Configuration imported successfully");
                 }).catch(() => {
                     toast.error("Error importing configuration, make sure it is unchanged from the export.");
+                }).finally(() => {
+                    setLoading(false);
+                    setAgree(false);
                 });
             } catch (e) {
                 console.log(e);
                 toast.error("Error parsing JSON file");
+                setLoading(false);
             }
         };
 
         reader.onerror = () => {
             toast.error("Error reading file");
+            setLoading(false);
         };
 
-        reader.readAsText(configFile);
+        reader.readAsArrayBuffer(configFile);
     };
 
     return (
         <Card>
             <CardContent>
                 <Typography variant="h5" gutterBottom>Import/Export Configuration</Typography>
-                <Typography variant="h6" gutterBottom>Export Configuration File</Typography>
-                <Button variant="contained" size="large" startIcon={<Download/>}
-                        onClick={downloadExportFile}>Download</Button>
+                <Typography variant="h6" gutterBottom>Export Configuration</Typography>
+                <LoadingButton variant="contained" size="large" loading={loading} startIcon={<Download/>}
+                               onClick={downloadExportFile}>Download</LoadingButton>
                 <Divider sx={{my: 2,}}/>
-                <Typography variant="h6" gutterBottom>Import Configuration File</Typography>
+                <Typography variant="h6" gutterBottom>Import Configuration</Typography>
                 <form action={submitConfigFile}>
                     <Box>
-                        <input type="file" accept=".json" name="config"/>
+                        <input type="file" accept=".zip" name="config"/>
                         <Box sx={{color: 'red', my: 2,}}>
                             <Typography variant="h5" gutterBottom>THIS ACTION WILL DELETE THE EXISTING CONFIGURATION
                                 PERMANENTLY:</Typography>
@@ -72,8 +84,9 @@ export default function Page() {
                         <FormControlLabel
                             control={<Checkbox name="agree" value={agree} onChange={(e, v) => setAgree(v)}/>}
                             label="Do you understand EVERYTHING above?"/>
-                        <Button type="submit" variant="contained" color="error" disabled={!agree}>Activate
-                            Configuration</Button>
+                        <LoadingButton type="submit" variant="contained" color="error" loading={loading}
+                                       disabled={!agree}>Activate
+                            Configuration</LoadingButton>
                     </Box>
                 </form>
 

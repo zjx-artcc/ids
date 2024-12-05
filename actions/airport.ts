@@ -3,6 +3,7 @@
 import {z} from "zod";
 import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";
+import {unstable_after as after} from "next/server";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 import {AirportRunway, Prisma} from "@prisma/client";
 import {log} from "@/actions/log";
@@ -175,7 +176,9 @@ export const createOrUpdateAirport = async (formData: FormData) => {
 
     await prisma.airportRunway.deleteMany({
         where: {
-            airportId: result.data.id || '',
+            id: {
+                notIn: result.data.runways.map((runway) => runway.id || ''),
+            },
         },
     });
 
@@ -206,13 +209,6 @@ export const createOrUpdateAirport = async (formData: FormData) => {
         update: {
             icao: result.data.icao,
             iata: result.data.iata,
-            runways: {
-                create: result.data.runways.map((runway) => ({
-                    runwayIdentifier: runway.runwayIdentifier,
-                    availableDepartureTypes: runway.availableDepartureTypes,
-                    availableApproachTypes: runway.availableApproachTypes,
-                })),
-            },
             radars: {
                 set: result.data.radars.map((radarId) => ({id: radarId})),
             },
@@ -223,10 +219,57 @@ export const createOrUpdateAirport = async (formData: FormData) => {
     });
 
     if (result.data.id) {
-        await log("UPDATE", "AIRPORT", `Updated airport ${result.data.icao}`);
-    } else {
-        await log("CREATE", "AIRPORT", `Created airport ${result.data.icao}`);
+        for (const runway of result.data.runways) {
+            await prisma.airportRunway.upsert({
+                create: {
+                    runwayIdentifier: runway.runwayIdentifier,
+                    availableDepartureTypes: {set: runway.availableDepartureTypes},
+                    availableApproachTypes: {set: runway.availableApproachTypes},
+                    airport: {
+                        connect: {id: airport.id},
+                    },
+                },
+                update: {
+                    runwayIdentifier: runway.runwayIdentifier,
+                    availableDepartureTypes: {set: runway.availableDepartureTypes},
+                    availableApproachTypes: {set: runway.availableApproachTypes},
+                },
+                where: {
+                    id: runway.id || '',
+                },
+            });
+
+            after(async () => {
+                const flowRunways = await prisma.flowPresetRunway.findMany({
+                    where: {
+                        runwayId: runway.id,
+                    },
+                });
+
+                for (const fr of flowRunways) {
+                    await prisma.flowPresetRunway.update({
+                        where: {id: fr.id},
+                        data: {
+                            departureTypes: {
+                                set: fr.departureTypes.filter((dt) => runway.availableDepartureTypes.includes(dt)),
+                            },
+                            approachTypes: {
+                                set: fr.approachTypes.filter((at) => runway.availableApproachTypes.includes(at)),
+                            },
+                        },
+                    });
+                }
+            });
+        }
     }
+
+    after(async () => {
+        if (result.data.id) {
+            await log("UPDATE", "AIRPORT", `Updated airport ${result.data.icao}`);
+        } else {
+            await log("CREATE", "AIRPORT", `Created airport ${result.data.icao}`);
+        }
+    });
 
     revalidatePath("/admin/airports");
 

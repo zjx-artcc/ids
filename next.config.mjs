@@ -4,6 +4,9 @@ import config from './package.json' with {type: 'json'};
 const nextConfig = {
     output: 'standalone',
     distDir: 'dist',
+    experimental: {
+        after: true,
+    },
     publicRuntimeConfig: {
         version: config.version,
         author: config.author,

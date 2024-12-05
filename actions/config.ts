@@ -12,6 +12,8 @@ import {
 } from "@prisma/client";
 import prisma from "@/lib/db";
 import {log} from "@/actions/log";
+import JSZip from "jszip";
+import {UTApi} from "uploadthing/server";
 
 type RadarWithConnectedAirports = Radar & { connectedAirports: { id: string, }[], };
 type RadarSectorWithBorderingSectors = RadarSector & { borderingSectors: { id: string, }[], };
@@ -30,7 +32,15 @@ export type ConfigFile = {
     airspaceDiagrams: AirspaceDiagram[];
 }
 
-export const importConfigFile = async (config: ConfigFile) => {
+const ut = new UTApi();
+
+export const importConfigFile = async (zipFile: Uint8Array) => {
+
+    const zip = new JSZip();
+
+    await zip.loadAsync(zipFile);
+
+    const config = JSON.parse(await zip.file("config.json")?.async("text") as string) as ConfigFile;
 
     await prisma.facility.deleteMany();
     await prisma.airport.deleteMany();
@@ -86,9 +96,34 @@ export const importConfigFile = async (config: ConfigFile) => {
         })),
     });
 
-    await prisma.airspaceDiagram.createMany({
-        data: config.airspaceDiagrams,
-    });
+    const airspaceImages = zip.folder("airspace-images");
+
+    for (const diagram of config.airspaceDiagrams) {
+        const image = await airspaceImages?.file(`${diagram.id}.png`)?.async("blob");
+
+        if (!image) {
+            continue;
+        }
+
+        await ut.deleteFiles([diagram.key]);
+
+        const imageFile = new File([image], `${diagram.id}.png`, {type: "image/png"});
+
+        const res = await ut.uploadFiles(imageFile);
+
+        if (res.error) {
+            console.log(res.error);
+            throw new Error("Error uploading airspace diagram");
+        }
+
+
+        await prisma.airspaceDiagram.create({
+            data: {
+                ...diagram,
+                key: res.data.key,
+            },
+        });
+    }
 
     for (const radar of config.radars) {
         await prisma.radar.update({

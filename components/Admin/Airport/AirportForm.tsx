@@ -114,6 +114,8 @@ export default function AirportForm({airport, currentRunways, currentRadars, all
                 </Grid2>
                 <Grid2 size={{xs: 2}}>
                     <FormSaveButton/>
+                    <Typography variant="subtitle2" sx={{mt: 1,}}>Any invalid runway departure types or approach types
+                        using in flow presets for this airport will be removed.</Typography>
                 </Grid2>
             </Grid2>
             <EditRunwayDialog
