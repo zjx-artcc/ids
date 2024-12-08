@@ -1,13 +1,14 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {Box, CircularProgress, Divider, Grid2, Stack, Tooltip, Typography} from "@mui/material";
+import {Box, CircularProgress, Divider, Grid2, Stack, TextField, Tooltip, Typography} from "@mui/material";
 import {AtisUpdate} from "@/types";
 import {fetchMetar} from "@/actions/atis";
 import {socket} from "@/lib/socket";
 import {getMetarColor} from "@/lib/metar";
 
-export default function AirportAtisGridItems({icao, small}: { icao: string, small?: boolean }) {
+export default function AirportAtisGridItems({icao, small, free, }: { icao: string, small?: boolean, free?: boolean, }) {
 
+    const [airportIcao, setairportIcao] = useState<string>(icao);
     const [combinedAtis, setCombinedAtis] = useState<AtisUpdate>();
     const [departureAtis, setDepartureAtis] = useState<AtisUpdate>();
     const [arrivalAtis, setArrivalAtis] = useState<AtisUpdate>();
@@ -16,14 +17,14 @@ export default function AirportAtisGridItems({icao, small}: { icao: string, smal
 
     useEffect(() => {
         socket.on('vatsim-data', (data) => {
-            fetchMetar(icao).then(setMetar);
+            fetchMetar(airportIcao).then(setMetar);
             (data.atis as {
                 atis_code: string,
                 callsign: string,
                 frequency: string,
                 text_atis: string[],
             }[])
-                .filter((atis) => atis.callsign.startsWith(icao))
+                .filter((atis) => airportIcao.length === 4 ? atis.callsign.startsWith(airportIcao) : false)
                 .map((atis) => {
                     let textAtisLetter = atis.atis_code;
                     if (atis?.text_atis && atis.text_atis.length > 0) {
@@ -51,23 +52,31 @@ export default function AirportAtisGridItems({icao, small}: { icao: string, smal
         return () => {
             socket.off('vatsim-data');
         };
-    }, [icao]);
+    }, [airportIcao]);
 
     const {wind, altimeter} = getWindAndAltimeter(metar || '');
+
+    const handleAirportIcaoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setairportIcao(e.target.value.toUpperCase());
+        fetchMetar(e.target.value.toUpperCase()).then(setMetar);
+    }
 
     if (small) {
         return (
             <>
                 <Grid2 size={1} sx={{border: 1,}}>
-                    <Typography variant="h6" textAlign="center">{icao.toUpperCase()}</Typography>
+                    {free && 
+                    <TextField variant="outlined" label="ICAO" size="small" value={airportIcao} onChange={handleAirportIcaoChange} sx={{width: '100%', }}  />
+                    }
+                    {!free && <Typography variant="h6" textAlign="center">{airportIcao.toUpperCase()}</Typography>}
                 </Grid2>
                 <Grid2 size={1} sx={{border: 1,}}>
-                    {!metar &&
+                    {!free && !metar &&
                         <Stack direction="column" justifyContent="center" alignItems="center">
                             <CircularProgress size={25}/>
                         </Stack>
                     }
-                    {metar && <Tooltip title={metar} arrow>
+                    {!free && metar && <Tooltip title={metar} arrow>
                         <Box>
                             {!combinedAtis && !departureAtis && !arrivalAtis &&
                                 <Typography variant="h5" textAlign="center" color={getMetarColor(metar || '')}
@@ -79,6 +88,10 @@ export default function AirportAtisGridItems({icao, small}: { icao: string, smal
                                 style={{color: 'green'}}>{departureAtis?.atisLetter || '-'}</span>/<span
                                 style={{color: 'red'}}>{arrivalAtis?.atisLetter || '-'}</span></Typography>}
                         </Box>
+                    </Tooltip>}
+                    {free && <Tooltip title={metar} arrow>
+                        <Typography variant="h6" textAlign="center" color={getMetarColor(metar || '')}
+                                    fontWeight="bold">UNK</Typography>
                     </Tooltip>}
                 </Grid2>
                 <Grid2 size={2} sx={{border: 1,}}>
@@ -98,7 +111,7 @@ export default function AirportAtisGridItems({icao, small}: { icao: string, smal
     return (
         <>
             <Grid2 size={2} sx={{border: 1,}}>
-                <Typography variant="h3" textAlign="center">{icao.toUpperCase()}</Typography>
+                <Typography variant="h3" textAlign="center">{airportIcao.toUpperCase()}</Typography>
                 {!metar &&
                     <Stack direction="column" alignItems="center">
                         <CircularProgress size={80}/>

@@ -174,13 +174,18 @@ export const createOrUpdateAirport = async (formData: FormData) => {
         return {errors: result.error.errors};
     }
 
-    await prisma.airportRunway.deleteMany({
-        where: {
-            id: {
-                notIn: result.data.runways.map((runway) => runway.id || ''),
+    if (result.data.id) {
+        await prisma.airportRunway.deleteMany({
+            where: {
+                airport: {
+                    id: result.data.id || '',
+                },
+                id: {
+                    notIn: result.data.runways.map((runway) => runway.id || ''),
+                },
             },
-        },
-    });
+        });
+    }
 
     const airport = await prisma.airport.upsert({
         create: {

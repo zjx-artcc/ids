@@ -47,7 +47,7 @@ export default function RadarBorderingSectorsGridItem({user, radar}: { user: Use
     }
 
     return (
-        <Grid2 size={4} height={250} sx={{border: 1,}}>
+        <Grid2 size={4} height={250} sx={{border: 1, overflowY: 'auto' }}>
             <Typography variant="h6">BORDERING SECTORS</Typography>
             <Grid2 container columns={3}>
                 {!borderingSectors && <CircularProgress/>}

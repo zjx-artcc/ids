@@ -23,6 +23,8 @@ import {toast} from "react-toastify";
 import {socket} from "@/lib/socket";
 import {Delete, Edit} from "@mui/icons-material";
 import {fetchAllDefaultRadarConsolidations} from "@/actions/defaultRadarConsolidation";
+import { useSession } from 'next-auth/react';
+import { fetchAllUsers } from '@/actions/user';
 
 type Consolidation = RadarConsolidation & {
     primarySector: RadarSectorWithRadar;
@@ -41,18 +43,29 @@ type DefaultRadarConsolidationWithSectors = DefaultRadarConsolidation & {
 
 export default function Consolidation() {
 
+    const session = useSession();
+    const [allUsers, setAllUsers] = useState<{id: string, firstName: string | null, lastName: string | null, fullName: string | null, cid: string}[]>();
+    const [selectedUser, setSelectedUser] = useState<{id: string, firstName: string | null, lastName: string | null, fullName: string | null, cid: string} | null>();
     const [allRadarConsolidations, setAllRadarConsolidations] = useState<Consolidation[]>();
+    const [yourConsolidation, setYourConsolidation] = useState<Consolidation | null>();
     const [allRadarSectors, setAllRadarSectors] = useState<RadarSectorWithRadar[]>();
     const [allDefaultConsolidations, setAllDefaultConsolidations] = useState<DefaultRadarConsolidationWithSectors[]>();
-    const [primarySector, setPrimarySector] = useState<RadarSectorWithRadar | null>(null);
+    const [primarySector, setPrimarySector] = useState<RadarSectorWithRadar | null>(yourConsolidation?.primarySector || null);
     const [secondarySectors, setSecondarySectors] = useState<RadarSectorWithRadar[]>([]);
     const [editMode, setEditMode] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchAllConsolidations().then(setAllRadarConsolidations);
+        fetchAllConsolidations().then((all) => {
+            setAllRadarConsolidations(all);
+            setYourConsolidation(all.find((consolidation) => consolidation.user.id === (selectedUser?.id || session.data?.user?.id)) || null);
+        });
         fetchAllRadarSectors().then(setAllRadarSectors);
         fetchAllDefaultRadarConsolidations().then(setAllDefaultConsolidations);
-    }, []);
+        fetchAllUsers().then(setAllUsers);
+        if (!selectedUser) {
+            setSelectedUser(session.data?.user as User);
+        }
+    }, [session, selectedUser]);
 
     const handleEditToggle = (id: string | null, consolidation?: Consolidation) => {
         if (consolidation) {
@@ -66,31 +79,44 @@ export default function Consolidation() {
     };
 
     const handleSave = async () => {
-        if (!primarySector) {
-            toast.error('Primary sector is required');
-            return;
-        }
-        if (secondarySectors.some(sector => sector.id === primarySector.id)) {
-            toast.error('Primary sector cannot be a secondary sector');
-            return;
-        }
 
-        if (editMode) {
-            const {error} = await updateConsolidation(editMode, primarySector.id, secondarySectors.map(sector => sector.id));
+        if (yourConsolidation && editMode === null) {
+            const {error} = await updateConsolidation(yourConsolidation.id, yourConsolidation.primarySector.id, [...yourConsolidation.secondarySectors, ...secondarySectors].map(sector => sector.id));
             if (error) {
                 toast.error(error);
                 return;
             }
             toast.success('Consolidation updated successfully');
         } else {
-            const {error} = await createConsolidation(primarySector.id, secondarySectors.map(sector => sector.id));
+            if (!selectedUser) {
+                toast.error('Controller is required');
+                return;
+            }
+            if (!primarySector) {
+                toast.error('Primary sector is required');
+                return;
+            }
+            if (secondarySectors.some(sector => sector.id === primarySector.id)) {
+                toast.error('Primary sector cannot be a secondary sector');
+                return;
+            }
+
+            if (editMode) {
+                const {error} = await updateConsolidation(editMode, primarySector.id, secondarySectors.map(sector => sector.id));
+                if (error) {
+                toast.error(error);
+                    return;
+                }
+                toast.success('Consolidation updated successfully');
+            } else {
+                const {error} = await createConsolidation(selectedUser.id, primarySector.id, secondarySectors.map(sector => sector.id));
             if (error) {
                 toast.error(error);
                 return;
             }
-            toast.success('Consolidation created successfully');
+                toast.success('Consolidation created successfully');
+            }
         }
-
         fetchAllConsolidations().then(setAllRadarConsolidations);
         setPrimarySector(null);
         setSecondarySectors([]);
@@ -107,7 +133,9 @@ export default function Consolidation() {
 
     const handleDefaultConsolidationSelect = (newValue: DefaultRadarConsolidationWithSectors | null) => {
         if (newValue) {
-            setPrimarySector(newValue.primarySector);
+            if (yourConsolidation) {
+                setPrimarySector(newValue.primarySector);
+            }
             setSecondarySectors(newValue.secondarySectors);
         }
     };
@@ -149,7 +177,7 @@ export default function Consolidation() {
                                         onChange={(event, newValue) => setSecondarySectors(newValue)}
                                         renderInput={(params) => <TextField {...params} label="Select Secondary Sectors"
                                                                             variant="outlined"
-                                                                            helperText="Leave blank if you are only assuming the FULLY DECONSOLIDATED version of the primary sector. (Ex. K -> K)"/>}
+                                                                            helperText="Leave blank if you are only assuming the FULLY DECONSOLIDATED version of the primary sector. (Ex. K -> K)."/>}
                                         sx={{mb: 2}}
                                     />
                                     <Button variant="contained" onClick={handleSave} sx={{mr: 2}}>
@@ -186,11 +214,20 @@ export default function Consolidation() {
             </Card>
             {!editMode && allRadarSectors && <Card>
                 <CardContent>
-                    <Typography variant="h6">New Radar Consolidation</Typography>
+                    <Typography variant="h6" gutterBottom>New Radar Consolidation</Typography>
+                    <Autocomplete
+                        options={allUsers || []}
+                        getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.cid})`}
+                        value={selectedUser}
+                        onChange={(event, newValue) => setSelectedUser(newValue)}
+                        renderInput={(params) => <TextField {...params} label="Select Controller" variant="outlined"/>}
+                        sx={{mb: 2}}
+                    />
                     <Autocomplete
                         options={allRadarSectors || []}
                         getOptionLabel={(option) => `${option.radar.facilityId} - ${option.identifier}`}
-                        value={primarySector}
+                        disabled={!!yourConsolidation}
+                        value={yourConsolidation?.primarySector || primarySector}
                         onChange={(event, newValue) => setPrimarySector(newValue)}
                         renderInput={(params) => <TextField {...params} label="Select Primary Sector" variant="outlined"
                                                             helperText="This is the sector you are logged into VATSIM as."/>}
@@ -205,7 +242,7 @@ export default function Consolidation() {
                         onChange={(event, newValue) => setSecondarySectors(newValue)}
                         renderInput={(params) => <TextField {...params} label="Select Secondary Sectors"
                                                             variant="outlined"
-                                                            helperText="Leave blank if you are only assuming the FULLY DECONSOLIDATED version of the primary sector. (Ex. K -> K)"/>}
+                                                            helperText="Leave blank if you are only assuming the FULLY DECONSOLIDATED version of the primary sector. (Ex. K -> K).  Also, if you already have a consolidation, the new secondary sectors will be added to the ones you already have."/>}
                         sx={{mb: 2}}
                     />
                     <Autocomplete

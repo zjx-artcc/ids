@@ -12,6 +12,7 @@ import Airspace from "@/components/Viewer/Airspace";
 import AirportSettings from "@/components/Viewer/AirportSettings";
 import RadarSettings from "@/components/Viewer/RadarSettings";
 import Consolidation from "@/components/Viewer/Consolidation";
+import { SessionProvider } from 'next-auth/react';
 
 export default function Viewer() {
 
@@ -23,18 +24,20 @@ export default function Viewer() {
 
     return (
         <Grid2 size={12} sx={{border: 1, minHeight: 950,}}>
-            <Typography variant="h6">VIEWER</Typography>
-            <div style={{paddingTop: 64, height: '1px',}} id="viewer"></div>
-            {display === 'url' && <UrlViewer url={searchParams.get('url') || ''}/>}
-            {display === 'emergency' && <EmergencyChecklist/>}
-            {display === 'position' && <PositionChecklist/>}
-            {display === 'wx' && <Weather/>}
-            {display === 'sop' && <SopViewer defaultFacility={sopFacility || undefined}/>}
-            {display === 'prd' && <PreferredRoutes startAirport={prdStartAirport || undefined}/>}
-            {display === 'airspace' && <Airspace/>}
-            {display === 'set-airport' && <AirportSettings/>}
-            {display === 'set-radar' && <RadarSettings/>}
-            {display === 'consol' && <Consolidation/>}
+            <SessionProvider>
+                <Typography variant="h6">VIEWER</Typography>
+                <div style={{paddingTop: 64, height: '1px',}} id="viewer"></div>
+                {display === 'url' && <UrlViewer url={searchParams.get('url') || ''}/>}
+                {display === 'emergency' && <EmergencyChecklist/>}
+                {display === 'position' && <PositionChecklist/>}
+                {display === 'wx' && <Weather/>}
+                {display === 'sop' && <SopViewer defaultFacility={sopFacility || undefined}/>}
+                {display === 'prd' && <PreferredRoutes startAirport={prdStartAirport || undefined}/>}
+                {display === 'airspace' && <Airspace/>}
+                {display === 'set-airport' && <AirportSettings/>}
+                {display === 'set-radar' && <RadarSettings/>}
+                {display === 'consol' && <Consolidation/>}
+            </SessionProvider>
         </Grid2>
     );
 }

@@ -13,6 +13,7 @@ import RadarChartSelector from "@/components/Radar/RadarChartSelector";
 import {Metadata} from "next";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
+import AirportAtisGridItems from '@/components/Airport/AirportAtisGridItems';
 
 export async function generateMetadata(props: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const params = await props.params;
@@ -68,6 +69,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 {radar.connectedAirports.map((airport) => (
                     <AirportInformationSmall key={airport.id} airport={airport} runways={airport.runways}/>
                 ))}
+                <Grid2 container columns={10}>
+                    <AirportAtisGridItems icao="" small free/>
+                </Grid2>
             </Grid2>
             <RadarBorderingSectorsGridItem user={session.user} radar={radar}/>
             <RadarChartSelector airports={radar.connectedAirports}/>

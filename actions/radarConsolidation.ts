@@ -24,12 +24,7 @@ export const fetchAllConsolidations = async () => {
     });
 }
 
-export const createConsolidation = async (primarySectorId: string, secondarySectorIds: string[]) => {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-        throw new Error("User not authenticated");
-    }
+export const createConsolidation = async (userId: string, primarySectorId: string, secondarySectorIds: string[]) => {
 
     // Fetch existing consolidations
     const existingConsolidations = await prisma.radarConsolidation.findMany({
@@ -40,7 +35,7 @@ export const createConsolidation = async (primarySectorId: string, secondarySect
         },
     });
 
-    if (existingConsolidations.map(consolidation => consolidation.userId).includes(session.user.id)) {
+    if (existingConsolidations.map(consolidation => consolidation.userId).includes(userId)) {
         return {error: "User already has a consolidation.  You can only work one primary sector at a time.  Consider adding to you secondary sectors."};
     }
 
@@ -80,7 +75,7 @@ export const createConsolidation = async (primarySectorId: string, secondarySect
             secondarySectors: {
                 connect: secondarySectorIds.map(id => ({id})),
             },
-            userId: session.user.id,
+            userId,
         },
         include: {
             primarySector: {
@@ -97,7 +92,7 @@ export const createConsolidation = async (primarySectorId: string, secondarySect
         },
     });
 
-    await log("CREATE", "RADAR_CONSOLIDATION", `Created radar consolidation with primary sector ${consolidation.primarySector.identifier} and secondary sectors ${consolidation.secondarySectors.map(sector => sector.identifier).join(", ")}`);
+    await log("CREATE", "RADAR_CONSOLIDATION", `Created radar consolidation for ${consolidation.user.fullName} (${consolidation.user.cid}) with primary sector ${consolidation.primarySector.identifier} and secondary sectors ${consolidation.secondarySectors.map(sector => sector.identifier).join(", ")}`);
 
     revalidatePath('/', "layout");
 
