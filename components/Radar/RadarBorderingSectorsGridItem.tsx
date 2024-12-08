@@ -50,8 +50,9 @@ export default function RadarBorderingSectorsGridItem({user, radar}: { user: Use
         <Grid2 size={4} height={250} sx={{border: 1, overflowY: 'auto' }}>
             <Typography variant="h6">BORDERING SECTORS</Typography>
             <Grid2 container columns={3}>
-                {!borderingSectors && <CircularProgress/>}
-                {borderingSectors && borderingSectors.length === 0 &&
+                <Grid2 size={2}>
+                    <Grid2 container columns={2}>
+                    {borderingSectors && borderingSectors.length === 0 &&
                     <Typography>You have no bordering sectors. Please define a radar consolidation to tell the system
                         what sectors you own and are logged on as.  If you have already done this, then make sure the current I.D.S you are on matches the facility that your primary sector is in. (Ex. PCT (OJAAY) must be in the PCT I.D.S)</Typography>}
                 {sectorsBordering.map((sectorWithBordering) => (
@@ -65,9 +66,12 @@ export default function RadarBorderingSectorsGridItem({user, radar}: { user: Use
                             <Typography key={sector.sector.id}
                                         variant="subtitle2">{`${sector.sector.radarId !== radar.id ? `${sector.sector.radar.facilityId} - ` : ''} ${sector.sector.identifier}`}</Typography>
                         ))}
+                        </Grid2>
+                    ))}
                     </Grid2>
-                ))}
-                {borderingSectors && borderingSectors.length > 0 && <Grid2 size={3} sx={{border: 1,}}>
+                </Grid2>
+                {!borderingSectors && <CircularProgress/>}
+                {borderingSectors && borderingSectors.length > 0 && <Grid2 size={1} sx={{border: 1,}}>
                     <Typography variant="h6" color="red">CLOSED</Typography>
                     {borderingSectors?.filter((sector) => sector.status === "closed").map((sector) => (
                         <Typography key={sector.sector.id}

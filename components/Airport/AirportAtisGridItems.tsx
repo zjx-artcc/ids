@@ -16,7 +16,8 @@ export default function AirportAtisGridItems({icao, small, free, }: { icao: stri
     const [metar, setMetar] = useState<string>();
 
     useEffect(() => {
-        socket.on('vatsim-data', (data) => {
+        if (!free) {
+            socket.on('vatsim-data', (data) => {
             fetchMetar(airportIcao).then(setMetar);
             (data.atis as {
                 atis_code: string,
@@ -47,12 +48,12 @@ export default function AirportAtisGridItems({icao, small, free, }: { icao: stri
                     }
                 });
 
-        });
-
+            });
+        }
         return () => {
             socket.off('vatsim-data');
         };
-    }, [airportIcao]);
+    }, [airportIcao, free]);
 
     const {wind, altimeter} = getWindAndAltimeter(metar || '');
 

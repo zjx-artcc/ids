@@ -6,6 +6,9 @@ const nextConfig = {
     distDir: 'dist',
     experimental: {
         after: true,
+        serverActions: {
+            bodySizeLimit: '5mb',
+        },
     },
     publicRuntimeConfig: {
         version: config.version,
