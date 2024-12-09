@@ -48,10 +48,10 @@ export default function AirportLocalInformation({airport, small,}: { airport: Ai
         }
 
         return (
-            <Grid2 size={2} sx={{border: 1,}}>
+            <Grid2 size={2} sx={{border: 1, }}>
                 <Tooltip title={<div style={{whiteSpace: 'pre-line'}}>{localSplit.join('\n')}</div>}>
                     <Typography variant="h6" textAlign="center"
-                                color={getColor(highestFacility?.facility || 0)}>{highestFacility?.position.substring(highestFacility?.position.length - 3) || 'CLSD'}</Typography>
+                                color={getColor(highestFacility?.facility || 0)}>{highestFacility?.position.substring(highestFacility?.position.length - 3) || 'CLSD'}/{localSplit.length === 0 ? highestFacility?.frequency || 'CTAF' : 'SPLIT'}</Typography>
                 </Tooltip>
             </Grid2>
         )

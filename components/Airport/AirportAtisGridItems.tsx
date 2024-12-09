@@ -17,41 +17,61 @@ export default function AirportAtisGridItems({icao, small, free, }: { icao: stri
 
     useEffect(() => {
         if (!free) {
+            socket.on(`${airportIcao}-atis`, (data: AtisUpdate) => {
+                console.log(data);
+                switch (data.atisType) {
+                    case 'combined':
+                        setCombinedAtis(data);
+                        break;
+                    case 'departure':
+                        setDepartureAtis(data);
+                        break;
+                    case 'arrival':
+                        setArrivalAtis(data);
+                        break;
+                }
+            });
             socket.on('vatsim-data', (data) => {
             fetchMetar(airportIcao).then(setMetar);
-            (data.atis as {
+            const atis = (data.atis as {
                 atis_code: string,
                 callsign: string,
                 frequency: string,
                 text_atis: string[],
             }[])
-                .filter((atis) => airportIcao.length === 4 ? atis.callsign.startsWith(airportIcao) : false)
-                .map((atis) => {
-                    let textAtisLetter = atis.atis_code;
-                    if (atis?.text_atis && atis.text_atis.length > 0) {
-                        textAtisLetter = atis.text_atis[0]?.match(/ATIS INFO ([A-Z])/i)?.[1] || '-';
-                    }
-                    const atisLetter = getMoreRecentAtisLetter(atis.atis_code, textAtisLetter);
+                .filter((atis) => airportIcao.length === 4 ? atis.callsign.startsWith(airportIcao) : false);
+            
+            if (atis.length === 0) {
+                setCombinedAtis(undefined);
+                setDepartureAtis(undefined);
+                setArrivalAtis(undefined);
+                return;
+            }
 
-                    const atisUpdate = {
-                        atisLetter: atisLetter,
-                        airportConditions: atis.text_atis?.join(' ') || 'N/A',
-                        notams: 'N/A',
-                    } as AtisUpdate;
+            atis.forEach((atis) => {
+                const atisLetter = (atis.text_atis as string[])[0]?.match(/ATIS INFO ([A-Z])/i)?.[1] || '-';
 
-                    if (atis.callsign.includes('_D_')) {
-                        setDepartureAtis(atisUpdate);
-                    } else if (atis.callsign.includes('_A_')) {
-                        setArrivalAtis(atisUpdate);
-                    } else {
-                        setCombinedAtis(atisUpdate);
-                    }
-                });
+                const atisUpdate = {
+                    atisLetter: atisLetter,
+                    airportConditions: atis.text_atis?.join(' ') || 'N/A',
+                    notams: 'N/A',
+                } as AtisUpdate;
 
+                // more than 5 minutes old
+                const tenMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+                if (atis.callsign.includes('_D_')) {
+                    setDepartureAtis((prev) => !prev || new Date(prev.timestamp) < tenMinutesAgo ? atisUpdate : prev);
+                } else if (atis.callsign.includes('_A_')) {
+                    setArrivalAtis((prev) => !prev || new Date(prev.timestamp) < tenMinutesAgo ? atisUpdate : prev);
+                } else {
+                    setCombinedAtis((prev) => !prev || new Date(prev.timestamp) < tenMinutesAgo ? atisUpdate : prev);
+                }
+                }); 
             });
         }
         return () => {
             socket.off('vatsim-data');
+            socket.off(`${airportIcao}-atis`);
         };
     }, [airportIcao, free]);
 
@@ -159,21 +179,7 @@ export const getWindAndAltimeter = (metar: string) => {
     const altimeter = metar.match(/A\d{4}/);
 
     return {
-        wind: wind ? wind[0] : '00000KT',
-        altimeter: altimeter ? altimeter[0] : 'A0000',
+        wind: wind ? wind[0] : '-',
+        altimeter: altimeter ? altimeter[0] : '-',
     };
 }
-
-const getMoreRecentAtisLetter = (atisCode: string, textAtisLetter: string): string => {
-    if (!atisCode) return textAtisLetter;
-    if (!textAtisLetter) return atisCode;
-
-    const atisCodeIndex = atisCode.charCodeAt(0);
-    const textAtisLetterIndex = textAtisLetter.charCodeAt(0);
-
-    if (textAtisLetterIndex > atisCodeIndex || (atisCodeIndex === 90 && textAtisLetterIndex === 65)) {
-        return textAtisLetter;
-    }
-
-    return atisCode;
-};
