@@ -31,14 +31,14 @@ export default function RadarSettings() {
     }, [allRadars, selectedRadar]);
 
     const saveRadarSplit = async () => {
-        const radar = await updateRadarSplit(selectedRadar?.id || '', radarSplit);
+        const radar = await updateRadarSplit(selectedRadar?.id || '', radarSplit.filter(s => s.trim() !== ''));
 
         toast.success('Radar Split updated successfully');
         socket.emit(`${radar.facilityId}-radar-split`, radar.radarSplit);
     }
 
     const saveNotams = async () => {
-        const radar = await updateNotams(selectedRadar?.id || '', notams);
+        const radar = await updateNotams(selectedRadar?.id || '', notams.filter(n => n.trim() !== ''));
 
         toast.success('NOTAMs updated successfully');
         socket.emit(`${radar.facilityId}-notam`, radar.notams);

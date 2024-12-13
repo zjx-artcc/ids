@@ -76,14 +76,14 @@ export default function AirportSettings() {
     }
 
     const saveLocalSplit = async () => {
-        const {airport} = await updateLocalSplit(selectedAirport?.id || '', localSplit);
+        const {airport} = await updateLocalSplit(selectedAirport?.id || '', localSplit.filter(s => s.trim() !== ''));
 
         toast.success('Local Split updated successfully');
         socket.emit(`${airport.facilityId}-lcl-split`, airport.localSplit);
     }
 
     const saveNotams = async () => {
-        const {airport} = await updateNotams(selectedAirport?.id || '', notams);
+        const {airport} = await updateNotams(selectedAirport?.id || '', notams.filter(n => n.trim() !== ''));
 
         toast.success('NOTAMs updated successfully');
         socket.emit(`${airport.facilityId}-notam`, airport.notams);
