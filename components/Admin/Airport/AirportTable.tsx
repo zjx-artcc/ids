@@ -40,6 +40,15 @@ export default function AirportTable() {
             filterable: false,
         },
         {
+            field: 'hidden',
+            headerName: 'Hidden',
+            flex: 1,
+            type: 'boolean',
+            renderCell: (params) => params.row.facility.hiddenFromPicker ? 'HIDDEN' : '',
+            sortable: false,
+            filterable: false,
+        },
+        {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',

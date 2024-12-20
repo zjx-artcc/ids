@@ -33,6 +33,22 @@ export async function POST(req: NextRequest) {
 
     const newRunways = [];
 
+    await prisma.airportRunway.updateMany({
+        where: {
+            airport: {
+                icao: facility,
+            }
+        },
+        data: {
+            inUseDepartureTypes: {
+                set: [],
+            },
+            inUseApproachTypes: {
+                set: [],
+            },
+        },
+    });
+
     for (const runway of flowPreset?.runways) {
         const updateData: AirportRunwayUpdateInput = {};
 
@@ -43,20 +59,6 @@ export async function POST(req: NextRequest) {
         if (atisType === "combined" || atisType === "arrival") {
             updateData.inUseApproachTypes = runway.approachTypes;
         }
-
-        await prisma.airportRunway.update({
-            where: {
-                id: runway.runway.id,
-            },
-            data: {
-                inUseDepartureTypes: {
-                    set: [],
-                },
-                inUseApproachTypes: {
-                    set: [],
-                },
-            },
-        });
 
         const r = await prisma.airportRunway.update({
             where: {

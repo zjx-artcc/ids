@@ -13,7 +13,7 @@ export type BorderingSector = {
     consolidatedTo?: RadarSectorWithRadar;
 }
 
-export const fetchBorderingSectors = async (user: User, thisRadar: Radar): Promise<BorderingSector[]> => {
+export const fetchBorderingSectors = async (user: User, thisRadar: Radar): Promise<BorderingSector[] | null> => {
 
     const radarConsolidation = await prisma.radarConsolidation.findFirst({
         where: {
@@ -44,12 +44,12 @@ export const fetchBorderingSectors = async (user: User, thisRadar: Radar): Promi
     });
 
     if (!radarConsolidation) {
-        return [];
+        return null;
     }
 
     // check if user is working this radar as a primary sector
     if (radarConsolidation.primarySector.radarId !== thisRadar.id) {
-        return [];
+        return null;
     }
 
     const borderingPrimary = radarConsolidation.primarySector.borderingSectors;

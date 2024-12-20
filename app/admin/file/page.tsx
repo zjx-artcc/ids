@@ -64,6 +64,8 @@ export default function Page() {
                 <Typography variant="h6" gutterBottom>Export Configuration</Typography>
                 <LoadingButton variant="contained" size="large" loading={loading} startIcon={<Download/>}
                                onClick={downloadExportFile}>Download</LoadingButton>
+                <Typography>Export the current configuration to a zip file. This will take a FEW MINUTES to process. <b>!!
+                    DO NOT CLICK MULTIPLE TIMES !!</b></Typography>
                 <Divider sx={{my: 2,}}/>
                 <Typography variant="h6" gutterBottom>Import Configuration</Typography>
                 <form action={submitConfigFile}>

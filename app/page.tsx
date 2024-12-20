@@ -19,6 +19,7 @@ export default async function Home() {
             airport: {
                 isNot: null,
             },
+            hiddenFromPicker: false,
         },
         orderBy: {
             order: 'asc',
@@ -30,6 +31,7 @@ export default async function Home() {
             radar: {
                 isEnrouteFacility: false,
             },
+            hiddenFromPicker: false,
         },
         orderBy: {
             order: 'asc',
@@ -41,6 +43,7 @@ export default async function Home() {
             radar: {
                 isEnrouteFacility: true,
             },
+            hiddenFromPicker: false,
         },
         orderBy: {
             order: 'asc',

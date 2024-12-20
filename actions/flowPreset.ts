@@ -7,6 +7,21 @@ import {z} from "zod";
 import {revalidatePath} from "next/cache";
 import {log} from "@/actions/log";
 
+export const fetchFlowPresetsForAirport = async (airportId: string) => {
+    return prisma.flowPreset.findMany({
+        where: {
+            airportId,
+        },
+        include: {
+            runways: {
+                include: {
+                    runway: true,
+                },
+            },
+        },
+    });
+}
+
 export const fetchFlowPresets = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
     const orderBy: Prisma.FlowPresetOrderByWithRelationInput = {};
     if (sort.length > 0) {

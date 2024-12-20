@@ -73,6 +73,7 @@ export const fetchRadars = async (pagination: GridPaginationModel, sort: GridSor
                         icao: 'asc',
                     }
                 },
+                facility: true,
             },
         })
     ]);
@@ -137,6 +138,7 @@ const getWhere = (filter?: GridFilterItem): Prisma.RadarWhereInput => {
 export const createOrUpdateRadar = async (formData: FormData) => {
     const radarZ = z.object({
         id: z.string().optional(),
+        isHidden: z.boolean().optional(),
         identifier: z.string().min(1, "Identifier must not be empty"),
         name: z.string().min(1, "Name must not be empty"),
         sopLink: z.string().url("SOP Link must be a valid URL"),
@@ -146,6 +148,7 @@ export const createOrUpdateRadar = async (formData: FormData) => {
 
     const result = radarZ.safeParse({
         id: formData.get("id") as string,
+        isHidden: formData.get("isHidden") === "on",
         identifier: formData.get("identifier") as string,
         name: formData.get("name") as string,
         sopLink: formData.get("sopLink") as string,
@@ -178,6 +181,7 @@ export const createOrUpdateRadar = async (formData: FormData) => {
             facility: {
                 create: {
                     id: result.data.identifier,
+                    hiddenFromPicker: result.data.isHidden,
                 }
             },
         },
@@ -186,6 +190,12 @@ export const createOrUpdateRadar = async (formData: FormData) => {
             name: result.data.name,
             sopLink: result.data.sopLink,
             isEnrouteFacility: result.data.isEnrouteFacility,
+            facility: {
+                update: {
+                    hiddenFromPicker: result.data.isHidden,
+                    id: result.data.identifier,
+                },
+            },
             atcPrefixes: {
                 set: result.data.atcPrefixes,
             },

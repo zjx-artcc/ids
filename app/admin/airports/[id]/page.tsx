@@ -16,6 +16,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         include: {
             radars: true,
             runways: true,
+            facility: true,
         },
     });
 
@@ -33,7 +34,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         <>
             <Typography variant="h5" gutterBottom>Edit Airport {airport.icao}</Typography>
             <AirportForm airport={airport} currentRadars={airport.radars} currentRunways={airport.runways}
-                         allRadars={allRadars}/>
+                         allRadars={allRadars} hidden={airport.facility.hiddenFromPicker}/>
         </>
     );
 }

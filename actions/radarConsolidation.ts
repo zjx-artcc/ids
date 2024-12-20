@@ -1,8 +1,6 @@
 'use server';
 
 import prisma from "@/lib/db";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
 import {revalidatePath} from "next/cache";
 import {log} from "@/actions/log";
 
@@ -24,7 +22,7 @@ export const fetchAllConsolidations = async () => {
     });
 }
 
-export const createConsolidation = async (userId: string, primarySectorId: string, secondarySectorIds: string[]) => {
+export const createConsolidation = async (userId: string, primarySectorId: string, secondarySectorIds: string[], claimAll: boolean) => {
 
     // Fetch existing consolidations
     const existingConsolidations = await prisma.radarConsolidation.findMany({
@@ -68,12 +66,26 @@ export const createConsolidation = async (userId: string, primarySectorId: strin
         }
     }
 
+    let otherSectors: string[] = [];
+
+    if (claimAll) {
+        const allSectors = await prisma.radarSector.findMany({
+            select: {
+                id: true,
+            },
+        });
+        otherSectors = allSectors.map(sector => sector.id).filter(sectorId => {
+            return !existingConsolidations.some(consolidation => consolidation.primarySectorId === sectorId || consolidation.secondarySectors.map(sector => sector.id).includes(sectorId));
+        })
+            .filter(sectorId => sectorId !== primarySectorId && !secondarySectorIds.includes(sectorId));
+    }
+
     // Create the new consolidation
     const consolidation = await prisma.radarConsolidation.create({
         data: {
             primarySectorId,
             secondarySectors: {
-                connect: secondarySectorIds.map(id => ({id})),
+                connect: [...otherSectors.map(id => ({id})), ...secondarySectorIds.map(id => ({id}))],
             },
             userId,
         },

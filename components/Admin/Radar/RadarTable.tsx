@@ -52,6 +52,15 @@ export default function RadarTable() {
             flex: 1,
         },
         {
+            field: 'hidden',
+            headerName: 'Hidden',
+            flex: 1,
+            type: 'boolean',
+            renderCell: (params) => params.row.facility.hiddenFromPicker ? 'HIDDEN' : '',
+            sortable: false,
+            filterable: false,
+        },
+        {
             field: 'connectedAirports',
             headerName: 'Connected Airports',
             renderCell: (params) => params.row.connectedAirports.length,

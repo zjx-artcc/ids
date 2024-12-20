@@ -14,7 +14,7 @@ interface SectorWithBordering {
 
 export default function RadarBorderingSectorsGridItem({user, radar}: { user: User, radar: Radar, }) {
 
-    const [borderingSectors, setBorderingSectors] = useState<BorderingSector[]>();
+    const [borderingSectors, setBorderingSectors] = useState<BorderingSector[] | undefined | null>();
 
     useEffect(() => {
         fetchBorderingSectors(user, radar).then(setBorderingSectors);
@@ -48,37 +48,41 @@ export default function RadarBorderingSectorsGridItem({user, radar}: { user: Use
 
     return (
         <Grid2 size={4} height={250} sx={{border: 1, overflowY: 'auto' }}>
-            <Typography variant="h6">BORDERING SECTORS</Typography>
+            {/*<Typography variant="h6">BORDERING SECTORS</Typography>*/}
             <Grid2 container columns={3}>
-                <Grid2 size={2}>
-                    <Grid2 container columns={2}>
-                    {borderingSectors && borderingSectors.length === 0 &&
+                {borderingSectors === null &&
                     <Typography>You have no bordering sectors. Please define a radar consolidation to tell the system
                         what sectors you own and are logged on as.  If you have already done this, then make sure the current I.D.S you are on matches the facility that your primary sector is in. (Ex. PCT (OJAAY) must be in the PCT I.D.S)</Typography>}
+                <Grid2 size={2}>
+                    <Grid2 container columns={2}>
                 {sectorsBordering.map((sectorWithBordering) => (
                     <Grid2 key={sectorWithBordering.primarySector.id} size={1} sx={{border: 1,}}>
                         <Typography
-                            variant="h6"
+                            sx={{mb: -1,}}
+                            fontSize={16}
                             color="gold">{sectorWithBordering.primarySector.radarId !== radar.id ? `${sectorWithBordering.primarySector.radar.identifier} - ${sectorWithBordering.primarySector.identifier}` : sectorWithBordering.primarySector.identifier}</Typography>
-                        <Typography variant="subtitle1" color="lightgreen" gutterBottom>OPEN
-                            - {sectorWithBordering.primarySector.frequency}</Typography>
+                        <Typography variant="subtitle2"
+                                    color="lightgreen">{sectorWithBordering.primarySector.frequency}</Typography>
                         {sectorWithBordering.borderingSectors.map((sector) => (
                             <Typography key={sector.sector.id}
-                                        variant="subtitle2">{`${sector.sector.radarId !== radar.id ? `${sector.sector.radar.facilityId} - ` : ''} ${sector.sector.identifier}`}</Typography>
+                                        variant="body2">{`${sector.sector.radarId !== radar.id ? `${sector.sector.radar.facilityId} - ` : ''} ${sector.sector.identifier}`}</Typography>
                         ))}
                         </Grid2>
                     ))}
                     </Grid2>
                 </Grid2>
-                {!borderingSectors && <CircularProgress/>}
-                {borderingSectors && borderingSectors.length > 0 && <Grid2 size={1} sx={{border: 1,}}>
-                    <Typography variant="h6" color="red">CLOSED</Typography>
+                {borderingSectors && <Grid2 size={1} sx={{border: 1,}}>
+                    <Typography sx={{mb: -1,}}
+                                fontSize={16} color="red">CLOSED</Typography>
+                    {borderingSectors?.filter((sector) => sector.status === "closed").length === 0 &&
+                        <Typography variant="body2">N/A</Typography>}
                     {borderingSectors?.filter((sector) => sector.status === "closed").map((sector) => (
                         <Typography key={sector.sector.id}
-                                    variant="subtitle2">{`${sector.sector.radarId !== radar.id ? `${sector.sector.radar.facilityId} - ` : ''} ${sector.sector.identifier}`}</Typography>
+                                    variant="body2">{`${sector.sector.radarId !== radar.id ? `${sector.sector.radar.facilityId} - ` : ''} ${sector.sector.identifier}`}</Typography>
                     ))}
                 </Grid2>}
             </Grid2>
+            {borderingSectors === undefined && <CircularProgress/>}
         </Grid2>
     );
 }

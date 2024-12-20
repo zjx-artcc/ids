@@ -1,7 +1,17 @@
 'use client';
 import React, {useState} from 'react';
 import {Airport, AirportRunway, Radar} from '@prisma/client';
-import {Autocomplete, Box, Chip, Grid2, IconButton, TextField, Typography} from '@mui/material';
+import {
+    Autocomplete,
+    Box,
+    Checkbox,
+    Chip,
+    FormControlLabel,
+    Grid2,
+    IconButton,
+    TextField,
+    Typography
+} from '@mui/material';
 import {Delete, Edit} from '@mui/icons-material';
 import AirportRunwayForm from '@/components/Admin/Airport/AirportRunwayForm';
 import {createOrUpdateAirport} from '@/actions/airport';
@@ -10,8 +20,9 @@ import {toast} from 'react-toastify';
 import FormSaveButton from '@/components/Admin/Form/FormSaveButton';
 import EditRunwayDialog from '@/components/Admin/Airport/EditRunwayDialog';
 
-export default function AirportForm({airport, currentRunways, currentRadars, allRadars}: {
+export default function AirportForm({airport, hidden, currentRunways, currentRadars, allRadars}: {
     airport?: Airport,
+    hidden?: boolean,
     currentRunways?: AirportRunway[],
     currentRadars?: Radar[],
     allRadars: Radar[],
@@ -111,6 +122,10 @@ export default function AirportForm({airport, currentRunways, currentRadars, all
                         renderInput={(params) => <TextField {...params} label="Attached Radar Facilities"
                                                             helperText="This can be updated at any time, so don't worry if you haven't created any radar facilities yet."/>}
                     />
+                </Grid2>
+                <Grid2 size={{xs: 2}}>
+                    <FormControlLabel control={<Checkbox defaultChecked={hidden} name="isHidden"/>}
+                                      label="Hidden from facility picker?"/>
                 </Grid2>
                 <Grid2 size={{xs: 2}}>
                     <FormSaveButton/>

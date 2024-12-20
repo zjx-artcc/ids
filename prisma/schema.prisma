@@ -74,11 +74,12 @@ model TmuNotice {
 }
 
 model Facility {
-  id         String      @id @default(cuid())
-  order      Int         @default(0)
-  airport    Airport?
-  radar      Radar?
-  tmuNotices TmuNotice[]
+  id               String      @id @default(cuid())
+  order            Int         @default(0)
+  hiddenFromPicker Boolean     @default(false)
+  airport          Airport?
+  radar            Radar?
+  tmuNotices       TmuNotice[]
 }
 
 model Airport {

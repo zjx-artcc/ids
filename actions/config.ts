@@ -5,6 +5,7 @@ import {
     AirportRunway,
     AirspaceDiagram,
     DefaultRadarConsolidation,
+    Facility,
     FlowPreset,
     FlowPresetRunway,
     Radar,
@@ -22,6 +23,7 @@ type DefaultRadarConsolidationWithSecondarySectors = DefaultRadarConsolidation &
 };
 
 export type ConfigFile = {
+    facilities: Facility[];
     airports: Airport[];
     radars: RadarWithConnectedAirports[];
     runways: AirportRunway[];
@@ -52,11 +54,8 @@ export const importConfigFile = async (zipFile: Uint8Array) => {
     await prisma.defaultRadarConsolidation.deleteMany();
     await prisma.airspaceDiagram.deleteMany();
 
-
-    const facilities = [...config.airports, ...config.radars].map((f) => ({id: f.facilityId,}));
-
     await prisma.facility.createMany({
-        data: facilities,
+        data: config.facilities,
     });
 
     await prisma.airport.createMany({

@@ -1,13 +1,13 @@
 'use client';
 import React, {useState} from 'react';
 import {Radar} from "@prisma/client";
-import {Autocomplete, Chip, FormControlLabel, Grid2, Switch, TextField} from "@mui/material";
+import {Autocomplete, Checkbox, Chip, FormControlLabel, Grid2, Switch, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Admin/Form/FormSaveButton";
 import {createOrUpdateRadar} from "@/actions/radar";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
 
-export default function RadarForm({radar}: { radar?: Radar, }) {
+export default function RadarForm({radar, hidden}: { radar?: Radar, hidden?: boolean }) {
 
     const [selectedPrefixes, setSelectedPrefixes] = useState<string[]>(radar?.atcPrefixes || []);
     const router = useRouter();
@@ -77,6 +77,10 @@ export default function RadarForm({radar}: { radar?: Radar, }) {
                             />
                         )}
                     />
+                </Grid2>
+                <Grid2 size={{xs: 2}}>
+                    <FormControlLabel control={<Checkbox defaultChecked={hidden} name="isHidden"/>}
+                                      label="Hidden from facility picker?"/>
                 </Grid2>
                 <Grid2 size={{xs: 2,}}>
                     <FormSaveButton/>

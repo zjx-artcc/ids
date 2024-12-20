@@ -15,6 +15,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         where: {
             id,
         },
+        include: {
+            facility: true,
+        },
     });
 
     if (!radar) {
@@ -30,7 +33,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                         <Button variant="contained" startIcon={<Map/>}>Radar Sectors</Button>
                     </Link>
                 </Stack>
-                <RadarForm radar={radar}/>
+                <RadarForm radar={radar} hidden={radar.facility.hiddenFromPicker}/>
             </CardContent>
         </Card>
     );

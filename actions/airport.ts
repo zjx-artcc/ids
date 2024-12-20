@@ -117,6 +117,7 @@ export const fetchAirports = async (pagination: GridPaginationModel, sort: GridS
                         runwayIdentifier: 'asc',
                     },
                 },
+                facility: true,
             },
         })
     ]);
@@ -149,6 +150,7 @@ const getWhere = (filter?: GridFilterItem): Prisma.AirportWhereInput => {
 export const createOrUpdateAirport = async (formData: FormData) => {
     const airportZ = z.object({
         id: z.string().optional(),
+        isHidden: z.boolean().optional(),
         icao: z.string().toUpperCase().length(4, "ICAO is required and must be 4 characters long."),
         iata: z.string().toUpperCase().length(3, "IATA is required and must be 3 characters long."),
         sopLink: z.string().url("SOP Link is required and must be a valid URL."),
@@ -163,6 +165,7 @@ export const createOrUpdateAirport = async (formData: FormData) => {
 
     const result = airportZ.safeParse({
         id: formData.get("id") as string,
+        isHidden: formData.get("isHidden") === "on",
         icao: formData.get("icao") as string,
         iata: formData.get("iata") as string,
         sopLink: formData.get("sopLink") as string,
@@ -196,6 +199,7 @@ export const createOrUpdateAirport = async (formData: FormData) => {
                 connectOrCreate: {
                     where: {id: result.data.icao},
                     create: {
+                        hiddenFromPicker: result.data.isHidden,
                         id: result.data.icao,
                     }
                 },
@@ -214,6 +218,12 @@ export const createOrUpdateAirport = async (formData: FormData) => {
         update: {
             icao: result.data.icao,
             iata: result.data.iata,
+            facility: {
+                update: {
+                    id: result.data.icao,
+                    hiddenFromPicker: result.data.isHidden,
+                },
+            },
             radars: {
                 set: result.data.radars.map((radarId) => ({id: radarId})),
             },

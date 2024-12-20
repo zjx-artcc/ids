@@ -13,8 +13,10 @@ import {
     Button,
     Card,
     CardContent,
+    Checkbox,
     CircularProgress,
     Divider,
+    FormControlLabel,
     TextField,
     Typography
 } from "@mui/material";
@@ -23,8 +25,8 @@ import {toast} from "react-toastify";
 import {socket} from "@/lib/socket";
 import {Delete, Edit} from "@mui/icons-material";
 import {fetchAllDefaultRadarConsolidations} from "@/actions/defaultRadarConsolidation";
-import { useSession } from 'next-auth/react';
-import { fetchAllUsers } from '@/actions/user';
+import {useSession} from 'next-auth/react';
+import {fetchAllUsers} from '@/actions/user';
 
 type Consolidation = RadarConsolidation & {
     primarySector: RadarSectorWithRadar;
@@ -53,6 +55,7 @@ export default function Consolidation() {
     const [primarySector, setPrimarySector] = useState<RadarSectorWithRadar | null>(yourConsolidation?.primarySector || null);
     const [secondarySectors, setSecondarySectors] = useState<RadarSectorWithRadar[]>([]);
     const [editMode, setEditMode] = useState<string | null>(null);
+    const [consolidateAllSectors, setConsolidateAllSectors] = useState<boolean>(false);
 
     useEffect(() => {
         fetchAllConsolidations().then((all) => {
@@ -109,7 +112,7 @@ export default function Consolidation() {
                 }
                 toast.success('Consolidation updated successfully');
             } else {
-                const {error} = await createConsolidation(selectedUser.id, primarySector.id, secondarySectors.map(sector => sector.id));
+                const {error} = await createConsolidation(selectedUser.id, primarySector.id, secondarySectors.map(sector => sector.id), consolidateAllSectors);
             if (error) {
                 toast.error(error);
                 return;
@@ -118,9 +121,12 @@ export default function Consolidation() {
             }
         }
         fetchAllConsolidations().then(setAllRadarConsolidations);
-        setPrimarySector(null);
+        if (!yourConsolidation) {
+            setPrimarySector(null);
+        }
         setSecondarySectors([]);
         setEditMode(null);
+        setConsolidateAllSectors(false);
         socket.emit('radar-consolidation');
     };
 
@@ -254,6 +260,12 @@ export default function Consolidation() {
                                                             helperText="Select a default consolidation to pre-fill the primary and secondary sectors."/>}
                         sx={{mb: 2}}
                     />
+                    <FormControlLabel control={<Checkbox
+                        checked={consolidateAllSectors}
+                        onChange={(event, checked) => setConsolidateAllSectors(checked)}
+                    />}
+                                      label="Claim ALL unassigned sectors?  You only use this is you are working an enroute position."/>
+                    <Divider sx={{my: 2,}}/>
                     <Button variant="contained" onClick={handleSave}>
                         Create
                     </Button>

@@ -6,6 +6,8 @@ export async function GET() {
 
     const zip = new JSZip();
 
+    const facilities = await prisma.facility.findMany();
+
     const airports = await prisma.airport.findMany();
 
     const radars = await prisma.radar.findMany({
@@ -58,6 +60,7 @@ export async function GET() {
     await log("CREATE", "EXPORT", "Config zip created successfully");
 
     const configData = {
+        facilities,
         airports,
         radars,
         runways,

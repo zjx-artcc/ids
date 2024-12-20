@@ -1,6 +1,6 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {Airport, AirportRunway} from "@prisma/client";
+import {Airport, AirportRunway, FlowPreset, FlowPresetRunway} from "@prisma/client";
 import {fetchAllAirports, updateFlow, updateLocalSplit, updateNotams} from "@/actions/airport";
 import {
     Autocomplete,
@@ -15,14 +15,25 @@ import {
 } from "@mui/material";
 import {toast} from "react-toastify";
 import {socket} from "@/lib/socket";
+import {fetchFlowPresetsForAirport} from "@/actions/flowPreset";
 
 type AirportWithRunways = Airport & {
     runways: AirportRunway[];
 };
 
+type FlowPresetWithRunways = FlowPreset & {
+    runways: FlowPresetRunwayWithAirportRunway[],
+}
+
+type FlowPresetRunwayWithAirportRunway = FlowPresetRunway & {
+    runway: AirportRunway,
+}
+
 export default function AirportSettings() {
 
     const [allAirports, setAllAirports] = useState<AirportWithRunways[]>();
+    const [flowPresets, setFlowPresets] = useState<FlowPresetWithRunways[]>();
+    const [selectedFlowPreset, setSelectedFlowPreset] = useState<FlowPresetWithRunways | null>(null);
     const [selectedAirport, setSelectedAirport] = useState<AirportWithRunways | null>(null);
     const [runwaySettings, setRunwaySettings] = useState<{
         [key: string]: { inUseDepartureTypes: string[], inUseApproachTypes: string[] }
@@ -40,6 +51,7 @@ export default function AirportSettings() {
     useEffect(() => {
         if (!allAirports) fetchAllAirports().then(setAllAirports);
         if (selectedAirport) {
+            fetchFlowPresetsForAirport(selectedAirport.id).then(setFlowPresets);
             setRunwaySettings(selectedAirport.runways
                 .reduce((acc, runway) => ({
                     ...acc,
@@ -101,6 +113,20 @@ export default function AirportSettings() {
         return <CircularProgress/>;
     }
 
+    const handleFlowPresetChange = (newFlow: FlowPresetWithRunways | null) => {
+        if (newFlow) {
+            const newRunwaySettings = newFlow.runways.reduce((acc, runway) => ({
+                ...acc,
+                [runway.runwayId]: {
+                    inUseDepartureTypes: runway.departureTypes,
+                    inUseApproachTypes: runway.approachTypes,
+                },
+            }), {});
+            setRunwaySettings(newRunwaySettings);
+        }
+        setSelectedFlowPreset(newFlow);
+    }
+
     return (
         <Stack direction="column" spacing={2} sx={{mx: 2}}>
             <Card>
@@ -125,6 +151,15 @@ export default function AirportSettings() {
                         <CardContent>
                             <Typography variant="h6" gutterBottom>{selectedAirport.icao} Settings</Typography>
                             <Stack direction="column" spacing={2}>
+                                <Autocomplete
+                                    options={flowPresets || []}
+                                    value={selectedFlowPreset}
+                                    getOptionLabel={(option) => option.presetName}
+                                    onChange={(event, newValue) => handleFlowPresetChange(newValue)}
+                                    renderInput={(params) => <TextField {...params}
+                                                                        label={'Select flow preset'}
+                                                                        variant="filled"/>}
+                                />
                                 {selectedAirport.runways.map((runway) => (
                                     <Stack key={runway.id} direction="column" spacing={1}>
                                         <Typography variant="subtitle2">Runway {runway.runwayIdentifier}</Typography>
