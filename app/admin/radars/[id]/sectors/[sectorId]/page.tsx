@@ -40,7 +40,8 @@ export default async function Page(props: { params: Promise<{ id: string, sector
     return (
         <Card>
             <CardContent>
-                <Typography variant="h5" gutterBottom>Edit Radar Sector - {radarSector.radar.identifier}</Typography>
+                <Typography variant="h5">Edit Radar Sector - {radarSector.radar.identifier}</Typography>
+                <Typography variant="caption" gutterBottom>SECTOR ID: {radarSector.id}</Typography>
                 <RadarSectorForm radarSector={radarSector} borderingSectors={radarSector.borderingSectors}
                                  radar={radarSector.radar} allRadars={allRadars}
                                  allRadarSectors={allRadars.flatMap(radar => radar.sectors)}/>
