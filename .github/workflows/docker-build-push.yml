@@ -49,6 +49,9 @@ jobs:
             exit 1
           fi
 
+      - name: Run npm install
+        run: npm ci --legacy-peer-deps
+
       - name: Delete dist and .next directories if they exist
         run: |
           rm -rf dist .next
