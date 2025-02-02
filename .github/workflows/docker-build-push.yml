@@ -51,7 +51,7 @@ jobs:
 
       - name: Install dependencies for sharp
         run: |
-          npm install --cpu=x64 --os=linux --libc=glibc sharp
+          npm install --cpu=x64 --os=linux --libc=glibc sharp --legacy-peer-deps
 
       - name: Run npm install
         run: npm ci --legacy-peer-deps
