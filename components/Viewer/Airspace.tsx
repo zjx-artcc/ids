@@ -1,6 +1,6 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {fetchAllAirspaceDiagrams, getAirspaceDiagramUrl} from "@/actions/airspace";
+import {fetchAllAirspaceDiagrams} from "@/actions/airspace";
 import {Airport} from "@prisma/client";
 import {Autocomplete, Box, CircularProgress, Stack, TextField} from "@mui/material";
 import Image from "next/image";
@@ -60,10 +60,8 @@ export default function Airspace() {
             });
         } else if (selectedAirspace) {
             setLoading(true);
-            getAirspaceDiagramUrl(selectedAirspace.key).then((url) => {
-                setUrl(url);
-                setLoading(false);
-            });
+            setUrl(`https://utfs.io/f/${selectedAirspace.key}`);
+            setLoading(false);
         }
     }, [allAirspaces, selectedAirspace]);
 

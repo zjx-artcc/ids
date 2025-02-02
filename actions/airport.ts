@@ -3,7 +3,7 @@
 import {z} from "zod";
 import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";
-import {unstable_after as after} from "next/server";
+import {after} from "next/server";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 import {AirportRunway, Prisma} from "@prisma/client";
 import {log} from "@/actions/log";

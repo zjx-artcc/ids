@@ -139,9 +139,7 @@ export default function Consolidation() {
 
     const handleDefaultConsolidationSelect = (newValue: DefaultRadarConsolidationWithSectors | null) => {
         if (newValue) {
-            if (yourConsolidation) {
-                setPrimarySector(newValue.primarySector);
-            }
+            setPrimarySector(newValue.primarySector);
             setSecondarySectors(newValue.secondarySectors);
         }
     };

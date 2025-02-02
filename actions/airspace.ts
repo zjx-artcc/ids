@@ -12,10 +12,6 @@ const MAX_FILE_SIZE = 1024 * 1024 * 4;
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
 const ut = new UTApi();
 
-export const getAirspaceDiagramUrl = async (key: string) => {
-    return (await ut.getFileUrls([key])).data[0].url;
-}
-
 export const fetchAllAirspaceDiagrams = async () => {
     return prisma.airspaceDiagram.findMany({
         include: {

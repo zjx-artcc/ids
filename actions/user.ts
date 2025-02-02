@@ -3,7 +3,7 @@
 import prisma from "@/lib/db";
 
 export const fetchAllUsers = async () => {
-    return await prisma.user.findMany({
+    return prisma.user.findMany({
         select: {
             id: true,
             firstName: true,

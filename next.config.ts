@@ -1,11 +1,9 @@
 import config from './package.json' with {type: 'json'};
+import {NextConfig} from "next";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
     output: 'standalone',
-    distDir: 'dist',
     experimental: {
-        after: true,
         serverActions: {
             bodySizeLimit: '1gb',
         },
