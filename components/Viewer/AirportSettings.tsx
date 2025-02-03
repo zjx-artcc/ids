@@ -130,9 +130,8 @@ export default function AirportSettings() {
         setSelectedFlowPreset(newFlow);
     }
 
-    const handleVatisChange = (e: SyntheticEvent | any) => {
+    const handleVatisChange = (e: SyntheticEvent, checked: boolean) => {
         if (!selectedAirport) return;
-        const {checked} = e.target;
         updateVatisFlag(selectedAirport.icao, checked).then(() => {
             toast.success('Changed ATIS mode successfully');
             socket.emit(`${selectedAirport.icao}-vatis-integration`, !checked);
