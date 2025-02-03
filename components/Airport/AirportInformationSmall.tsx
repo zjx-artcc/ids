@@ -9,7 +9,7 @@ import AirportLocalInformation from "@/components/Airport/AirportLocalInformatio
 export default function AirportInformationSmall({airport, runways}: { airport: Airport, runways: AirportRunway[], }) {
     return (
         <Grid2 container columns={10}>
-            <AirportAtisGridItems icao={airport.icao} small/>
+            <AirportAtisGridItems icao={airport.icao} small atisIntegrationDisabled={airport.disableAutoAtis}/>
             <AirportFlowGridItem airport={airport} runways={runways} small/>
             <AirportLocalInformation airport={airport} small/>
         </Grid2>

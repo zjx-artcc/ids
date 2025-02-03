@@ -1,14 +1,17 @@
 'use client';
-import React, {useEffect, useState} from 'react';
+import React, {SyntheticEvent, useEffect, useState} from 'react';
 import {Airport, AirportRunway, FlowPreset, FlowPresetRunway} from "@prisma/client";
-import {fetchAllAirports, updateFlow, updateLocalSplit, updateNotams} from "@/actions/airport";
+import {fetchAllAirports, updateFlow, updateLocalSplit, updateNotams, updateVatisFlag} from "@/actions/airport";
 import {
     Autocomplete,
     Box,
     Button,
     Card,
     CardContent,
+    Checkbox,
     CircularProgress,
+    FormControlLabel,
+    Grid2,
     Stack,
     TextField,
     Typography
@@ -127,6 +130,15 @@ export default function AirportSettings() {
         setSelectedFlowPreset(newFlow);
     }
 
+    const handleVatisChange = (e: SyntheticEvent | any) => {
+        if (!selectedAirport) return;
+        const {checked} = e.target;
+        updateVatisFlag(selectedAirport.icao, checked).then(() => {
+            toast.success('Changed ATIS mode successfully');
+            socket.emit(`${selectedAirport.icao}-vatis-integration`, !checked);
+        });
+    }
+
     return (
         <Stack direction="column" spacing={2} sx={{mx: 2}}>
             <Card>
@@ -151,6 +163,12 @@ export default function AirportSettings() {
                         <CardContent>
                             <Typography variant="h6" gutterBottom>{selectedAirport.icao} Settings</Typography>
                             <Stack direction="column" spacing={2}>
+                                <Grid2 size={{xs: 2}}>
+                                    <FormControlLabel
+                                        control={<Checkbox defaultChecked={selectedAirport.disableAutoAtis}
+                                                           name="disableAutoAtis"/>}
+                                        label="Disable vATIS Sync?" onChange={handleVatisChange}/>
+                                </Grid2>
                                 <Autocomplete
                                     options={flowPresets || []}
                                     value={selectedFlowPreset}

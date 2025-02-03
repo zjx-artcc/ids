@@ -52,7 +52,7 @@ export default async function Page({params}: { params: Promise<{ id: string }> }
 
     return (
         <Grid2 container columns={12}>
-            <AirportAtisGridItems icao={airport.icao}/>
+            <AirportAtisGridItems icao={airport.icao} atisIntegrationDisabled={airport.disableAutoAtis}/>
             <AirportFlowGridItem airport={airport} runways={airport.runways}/>
             <AirportLocalInformation airport={airport}/>
             <NotamInformation facility={airport.facility} initialNotams={airport.notams}/>

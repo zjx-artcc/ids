@@ -95,6 +95,8 @@ model Airport {
   airspaceDiagrams AirspaceDiagram[]
   radars           Radar[]
   presets          FlowPreset[]
+
+  disableAutoAtis Boolean @default(false)
 }
 
 model AirportRunway {

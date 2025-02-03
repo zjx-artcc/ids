@@ -5,13 +5,20 @@ import {AtisUpdate} from "@/types";
 import {fetchMetar} from "@/actions/atis";
 import {socket} from "@/lib/socket";
 import {getMetarColor} from "@/lib/metar";
+import {toast} from "react-toastify";
 
-export default function AirportAtisGridItems({icao, small, free, }: { icao: string, small?: boolean, free?: boolean, }) {
+export default function AirportAtisGridItems({icao, small, free, atisIntegrationDisabled}: {
+    icao: string,
+    small?: boolean,
+    free?: boolean,
+    atisIntegrationDisabled?: boolean,
+}) {
 
     const [airportIcao, setairportIcao] = useState<string>(icao);
     const [combinedAtis, setCombinedAtis] = useState<AtisUpdate>();
     const [departureAtis, setDepartureAtis] = useState<AtisUpdate>();
     const [arrivalAtis, setArrivalAtis] = useState<AtisUpdate>();
+    const [atisDisabled, setAtisDisabled] = useState<boolean>(atisIntegrationDisabled ?? false);
 
     const [metar, setMetar] = useState<string>();
 
@@ -68,8 +75,14 @@ export default function AirportAtisGridItems({icao, small, free, }: { icao: stri
                 }
                 }); 
             });
+
+            socket.on(`${airportIcao}-vatis-integration`, (enabled: boolean) => {
+                setAtisDisabled(!enabled);
+                toast.warning(`ATIS Mode changed for ${airportIcao}`);
+            })
         }
         return () => {
+            socket.off(`${airportIcao}-vatis-integration`)
             socket.off('vatsim-data');
             socket.off(`${airportIcao}-atis`);
         };
@@ -89,7 +102,13 @@ export default function AirportAtisGridItems({icao, small, free, }: { icao: stri
                     {free && 
                     <TextField variant="outlined" label="ICAO" size="small" value={airportIcao} onChange={handleAirportIcaoChange} sx={{width: '100%', }}  />
                     }
-                    {!free && <Typography variant="h6" textAlign="center">{airportIcao.toUpperCase()}</Typography>}
+                    {!free && !atisDisabled &&
+                        <Typography variant="h6" textAlign="center">{airportIcao.toUpperCase()}</Typography>}
+                    {!free && atisDisabled &&
+                        <Tooltip title="vATIS Integration Disabled.  Enable it in airport settings.">
+                            <Typography variant="h6" color="orange"
+                                        textAlign="center">{airportIcao.toUpperCase()}</Typography>
+                        </Tooltip>}
                 </Grid2>
                 <Grid2 size={1} sx={{border: 1,}}>
                     {!free && !metar &&
@@ -133,6 +152,8 @@ export default function AirportAtisGridItems({icao, small, free, }: { icao: stri
         <>
             <Grid2 size={2} sx={{border: 1,}}>
                 <Typography variant="h3" textAlign="center">{airportIcao.toUpperCase()}</Typography>
+                {atisDisabled &&
+                    <Typography textAlign="center" color="orange" fontWeight="bold">AUTO FLOW DISABLED</Typography>}
                 {!metar &&
                     <Stack direction="column" alignItems="center">
                         <CircularProgress size={80}/>

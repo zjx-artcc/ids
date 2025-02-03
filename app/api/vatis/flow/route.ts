@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
         }
     });
 
-    if (!flowPreset) {
+    if (!flowPreset || flowPreset.airport.disableAutoAtis) {
         return NextResponse.json(false);
     }
 

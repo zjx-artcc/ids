@@ -20,6 +20,22 @@ export const fetchAllAirports = async () => {
     });
 }
 
+export const updateVatisFlag = async (icao: string, flag: boolean) => {
+
+    await prisma.airport.update({
+        where: {
+            icao,
+        },
+        data: {
+            disableAutoAtis: flag,
+        },
+    })
+
+    await log("UPDATE", "FRONTEND_ARP_SET", `${flag ? 'Disabled' : 'Enabled'} vAtis integration for ${icao}`);
+
+    revalidatePath('/', "layout");
+}
+
 export const updateFlow = async (icao: string, criteria: {
     [key: string]: { inUseDepartureTypes: string[], inUseApproachTypes: string[] }
 }) => {
