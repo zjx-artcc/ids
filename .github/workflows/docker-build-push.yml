@@ -64,6 +64,9 @@ jobs:
         run: |
           sed -i "/distDir: 'dist',/d" next.config.ts
 
+      - name: Rename .env.public to .env
+        run: mv .env.public .env
+
       - name: Run npm build
         run: npm run build
 
