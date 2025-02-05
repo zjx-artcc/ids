@@ -27,12 +27,13 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={1} justifyContent="space-between" sx={{mb: 1,}}>
+                <Stack direction="row" spacing={1} justifyContent="space-between">
                     <Typography variant="h5">Edit Radar Facility</Typography>
                     <Link href={`/admin/radars/${radar.id}/sectors`}>
                         <Button variant="contained" startIcon={<Map/>}>Radar Sectors</Button>
                     </Link>
                 </Stack>
+                <Typography variant="caption" gutterBottom>RADAR FACILITY ID: {radar.id}</Typography>
                 <RadarForm radar={radar} hidden={radar.facility.hiddenFromPicker}/>
             </CardContent>
         </Card>
