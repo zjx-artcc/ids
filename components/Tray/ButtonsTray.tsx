@@ -56,6 +56,11 @@ export default function ButtonsTray({airport, radar,}: { airport?: Airport, rada
                     <Link href="/">
                         <Button variant="contained" color="primary">EXIT</Button>
                     </Link>
+                    <Link href={redirectToViewer('url', new URLSearchParams({url: 'https://asx.vzdc.org/'}))}
+                          style={{color: 'inherit'}}>
+                        <Button variant="outlined" color="inherit" size="small"
+                                style={{borderTopRightRadius: '0px', borderBottomRightRadius: "0px"}}>ASX</Button>
+                    </Link>
                     <Link href={redirectToViewer('url', new URLSearchParams({url: 'https://vzdc.org/'}))}
                           style={{color: 'inherit'}}>
                         <Button variant="outlined" color="inherit" size="small" style={{borderTopRightRadius:'0px',borderBottomRightRadius:"0px"}}>VZDC WEBSITE</Button>
