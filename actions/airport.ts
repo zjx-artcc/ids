@@ -177,6 +177,7 @@ export const createOrUpdateAirport = async (formData: FormData) => {
             availableApproachTypes: z.array(z.string().min(1, "Available Approach Types are required")),
         })).min(1, "At least one runway is required"),
         radars: z.array(z.string()),
+        primaryRadar: z.string().min(1, "Primary Radar is required"),
     });
 
     const result = airportZ.safeParse({
@@ -187,6 +188,7 @@ export const createOrUpdateAirport = async (formData: FormData) => {
         sopLink: formData.get("sopLink") as string,
         runways: JSON.parse(formData.get("runways") as string),
         radars: JSON.parse(formData.get("radars") as string),
+        primaryRadar: formData.get("primaryRadar") as string,
     });
 
     if (!result.success) {
@@ -211,6 +213,9 @@ export const createOrUpdateAirport = async (formData: FormData) => {
             icao: result.data.icao,
             iata: result.data.iata,
             sopLink: result.data.sopLink,
+            primaryRadar: {
+                connect: {id: result.data.primaryRadar},
+            },
             facility: {
                 connectOrCreate: {
                     where: {id: result.data.icao},
@@ -234,6 +239,10 @@ export const createOrUpdateAirport = async (formData: FormData) => {
         update: {
             icao: result.data.icao,
             iata: result.data.iata,
+            sopLink: result.data.sopLink,
+            primaryRadar: {
+                connect: {id: result.data.primaryRadar},
+            },
             facility: {
                 update: {
                     id: result.data.icao,

@@ -20,11 +20,12 @@ import {toast} from 'react-toastify';
 import FormSaveButton from '@/components/Admin/Form/FormSaveButton';
 import EditRunwayDialog from '@/components/Admin/Airport/EditRunwayDialog';
 
-export default function AirportForm({airport, hidden, currentRunways, currentRadars, allRadars}: {
+export default function AirportForm({airport, hidden, currentRunways, currentRadars, primaryRadar, allRadars}: {
     airport?: Airport,
     hidden?: boolean,
     currentRunways?: AirportRunway[],
     currentRadars?: Radar[],
+    primaryRadar?: Radar,
     allRadars: Radar[],
 }) {
     const [icao, setIcao] = useState(airport?.icao || '');
@@ -32,6 +33,7 @@ export default function AirportForm({airport, hidden, currentRunways, currentRad
     const [sopLink, setSopLink] = useState(airport?.sopLink || '');
     const [runways, setRunways] = useState(currentRunways || []);
     const [radars, setRadars] = useState(currentRadars?.map((radar) => radar.id) || []);
+    const [primary, setPrimary] = useState(primaryRadar);
     const [editRunway, setEditRunway] = useState<AirportRunway | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const router = useRouter();
@@ -42,6 +44,7 @@ export default function AirportForm({airport, hidden, currentRunways, currentRad
         formData.set('iata', iata || '');
         formData.set('sopLink', sopLink || '');
         formData.set('runways', JSON.stringify(runways));
+        formData.set('primaryRadar', primary?.id || '');
         formData.set('radars', JSON.stringify(radars));
         const {errors} = await createOrUpdateAirport(formData);
         if (errors) {
@@ -103,6 +106,24 @@ export default function AirportForm({airport, hidden, currentRunways, currentRad
                 <Grid2 size={{xs: 2, md: 1}}>
                     <Typography variant="h6">New Runway</Typography>
                     <AirportRunwayForm onSubmit={(runway) => setRunways([...(runways || []), runway])}/>
+                </Grid2>
+                <Grid2 size={{xs: 2}}>
+                    <Autocomplete
+                        options={allRadars}
+                        getOptionLabel={(option) => option.identifier}
+                        value={primary}
+                        onChange={(event, newValue) => {
+                            setPrimary(newValue || undefined);
+                        }}
+                        renderTags={(value, getTagProps) =>
+                            value.map((option, index) => (
+                                // eslint-disable-next-line react/jsx-key
+                                <Chip {...getTagProps({index})} label={option.identifier}/>
+                            ))
+                        }
+                        renderInput={(params) => <TextField {...params} label="Primary Radar Facility"
+                                                            helperText="This is the facility immediately above this airport.  Assume no consolidations."/>}
+                    />
                 </Grid2>
                 <Grid2 size={{xs: 2}}>
                     <Autocomplete

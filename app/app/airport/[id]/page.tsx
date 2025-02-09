@@ -57,7 +57,7 @@ export default async function Page({params}: { params: Promise<{ id: string }> }
             <AirportLocalInformation airport={airport}/>
             <NotamInformation facility={airport.facility} initialNotams={airport.notams}/>
             <TmuGridItem facility={airport.facility}/>
-            <AirportRadarInformation radars={airport.radars}/>
+            <AirportRadarInformation icao={airport.icao} radars={airport.radars}/>
             <Grid2 size={6} sx={{border: 1,}}>
                 <Typography variant="h6">CHARTS</Typography>
                 <AirportCharts icao={airport.icao}/>

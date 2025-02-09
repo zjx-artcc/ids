@@ -4,21 +4,20 @@ import {Radar} from "@prisma/client";
 import {socket} from "@/lib/socket";
 import {Box, Grid2, Typography} from "@mui/material";
 import {getColor} from "@/lib/facilityColor";
-import {toast} from "react-toastify";
+import {getAirportRelatedConsolidations, SectorStatus} from "@/actions/airport-split";
 
-export default function AirportRadarInformation({radars}: { radars: Radar[], }) {
+export default function AirportRadarInformation({icao, radars}: { icao: string, radars: Radar[], }) {
 
     const [onlineAtc, setOnlineAtc] = useState<{ position: string, frequency: string, facility: number, }[]>();
-    const [radarSplit, setRadarSplit] = useState<{
-        radar: Radar,
-        data: string[],
-    }[]>(radars.filter((r) => r.radarSplit.length > 0).map((r) => ({
-        radar: r,
-        data: r.radarSplit
-    })).sort((a, b) => Number(a.radar.isEnrouteFacility) - Number(b.radar.isEnrouteFacility))
-        .sort((a, b) => a.radar.facilityId.localeCompare(b.radar.facilityId)));
+    const [radarConsolidations, setRadarConsolidations] = useState<SectorStatus[]>();
 
     useEffect(() => {
+
+        getAirportRelatedConsolidations(icao).then(setRadarConsolidations);
+        socket.on('radar-consolidation', () => {
+            getAirportRelatedConsolidations(icao).then(setRadarConsolidations);
+        });
+
         socket.on('vatsim-data', (data) => {
             setOnlineAtc((data.controllers as {
                 callsign: string,
@@ -35,23 +34,10 @@ export default function AirportRadarInformation({radars}: { radars: Radar[], }) 
                     facility: controller.facility,
                 })));
         });
-        radars.forEach((r) => {
-            socket.on(`${r.facilityId}-radar-split`, (data: string[]) => {
-                setRadarSplit((prev) => prev.filter((rs) => rs.radar.facilityId !== r.facilityId));
-                setRadarSplit((prev) => [...prev, {radar: r, data,}]);
-                setRadarSplit((prev) => prev
-                    .sort((a, b) => Number(a.radar.isEnrouteFacility) - Number(b.radar.isEnrouteFacility))
-                    .sort((a, b) => a.radar.facilityId.localeCompare(b.radar.facilityId))
-                );
-                toast.info(`${r.facilityId} radar split has been updated.`);
-            });
-        });
 
         return () => {
             socket.off('vatsim-data');
-            radars.forEach((r) => {
-                socket.off(`${r.facilityId}-radar-split`);
-            });
+            socket.off('radar-consolidation');
         };
     }, [radars]);
 
@@ -70,12 +56,12 @@ export default function AirportRadarInformation({radars}: { radars: Radar[], }) 
             <Grid2 size={2} sx={{border: 1,}}>
                 <Typography variant="h6">RADAR SPLIT</Typography>
                 <Box height={250} sx={{overflow: 'auto',}}>
-                    {radarSplit.map((rs) => (
-                        <Box key={rs.radar.id} sx={{mb: 1,}}>
-                            <Typography color="hotpink" fontWeight="bold">{rs.radar.facilityId}</Typography>
-                            {rs.data.map((s, idx) => (
-                                <Typography key={rs.radar.facilityId + idx + 'RADARSPLIT'}>{s}</Typography>
-                            ))}
+                    {!radarConsolidations && <Typography color="red">ERR: NO PRIM RADAR SET</Typography>}
+                    {radarConsolidations?.map((rs) => (
+                        <Box key={rs.sector.id} sx={{mb: 0.5,}}>
+                            <Typography variant="caption"><span
+                                style={{color: 'gold',}}>{rs.sector.identifier}</span> {'->'} <span
+                                style={{color: rs.open ? 'lightgreen' : rs.consolidatedTo ? 'cyan' : 'red'}}>{rs.open ? 'OPEN' : rs.consolidatedTo ? rs.consolidatedTo.identifier : 'CLOSED'}</span></Typography>
                         </Box>
                     ))}
                 </Box>

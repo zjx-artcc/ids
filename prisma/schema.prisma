@@ -93,8 +93,12 @@ model Airport {
   sopLink          String
   runways          AirportRunway[]
   airspaceDiagrams AirspaceDiagram[]
-  radars           Radar[]
-  presets          FlowPreset[]
+
+  primaryRadar   Radar?  @relation("primaryRadar", fields: [primaryRadarId], references: [id])
+  primaryRadarId String?
+
+  radars  Radar[]     @relation("allRadars")
+  presets FlowPreset[]
 
   disableAutoAtis Boolean @default(false)
 }
@@ -137,17 +141,20 @@ model FlowPresetRunway {
 }
 
 model Radar {
-  id                String        @id @default(cuid())
-  identifier        String        @unique
+  id         String   @id @default(cuid())
+  identifier String   @unique
   name              String
-  facility          Facility      @relation(fields: [facilityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  facilityId        String        @unique
+  facility   Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  facilityId String   @unique
   atcPrefixes       String[]
   radarSplit        String[]
   notams            String[]
   isEnrouteFacility Boolean
+
+  airportsPrimary Airport[] @relation("primaryRadar")
+
   sopLink           String
-  connectedAirports Airport[]
+  connectedAirports Airport[] @relation("allRadars")
   sectors           RadarSector[]
 }
 

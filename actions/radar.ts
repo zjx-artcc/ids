@@ -15,22 +15,6 @@ export const fetchAllRadars = async () => {
     });
 }
 
-export const updateRadarSplit = async (radarId: string, radarSplit: string[]) => {
-
-    const radar = await prisma.radar.update({
-        where: {
-            id: radarId,
-        },
-        data: {
-            radarSplit,
-        },
-    });
-
-    await log("UPDATE", "FRONTEND_RDR_SET", `Radar split updated for ${radar.facilityId}`);
-
-    return radar;
-}
-
 export const updateNotams = async (radarId: string, notams: string[]) => {
     const radar = await prisma.radar.update({
         where: {

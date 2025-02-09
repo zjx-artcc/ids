@@ -1,41 +1,23 @@
 'use client';
 import React, {useEffect, useState} from 'react';
 import {Radar} from "@prisma/client";
-import {
-    Autocomplete,
-    Button,
-    Card,
-    CardContent,
-    CircularProgress,
-    Stack,
-    TextField,
-    Typography
-} from "@mui/material";
+import {Autocomplete, Button, Card, CardContent, CircularProgress, Stack, TextField, Typography} from "@mui/material";
 import {toast} from "react-toastify";
 import {socket} from "@/lib/socket";
-import {fetchAllRadars, updateNotams, updateRadarSplit} from "@/actions/radar";
+import {fetchAllRadars, updateNotams} from "@/actions/radar";
 
 export default function RadarSettings() {
 
     const [allRadars, setAllRadars] = useState<Radar[]>();
     const [selectedRadar, setSelectedRadar] = useState<Radar | null>(null);
-    const [radarSplit, setRadarSplit] = useState<string[]>(selectedRadar?.radarSplit || []);
     const [notams, setNotams] = useState<string[]>(selectedRadar?.notams || []);
 
     useEffect(() => {
         if (!allRadars) fetchAllRadars().then(setAllRadars);
         if (selectedRadar) {
-            setRadarSplit(selectedRadar.radarSplit);
             setNotams(selectedRadar.notams);
         }
     }, [allRadars, selectedRadar]);
-
-    const saveRadarSplit = async () => {
-        const radar = await updateRadarSplit(selectedRadar?.id || '', radarSplit.filter(s => s.trim() !== ''));
-
-        toast.success('Radar Split updated successfully');
-        socket.emit(`${radar.facilityId}-radar-split`, radar.radarSplit);
-    }
 
     const saveNotams = async () => {
         const radar = await updateNotams(selectedRadar?.id || '', notams.filter(n => n.trim() !== ''));
@@ -43,10 +25,6 @@ export default function RadarSettings() {
         toast.success('NOTAMs updated successfully');
         socket.emit(`${radar.facilityId}-notam`, radar.notams);
     }
-
-    const handleRadarSplitChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRadarSplit(event.target.value.split('\n'));
-    };
 
     const handleNotamsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNotams(event.target.value.split('\n'));
@@ -79,18 +57,6 @@ export default function RadarSettings() {
                     <Card>
                         <CardContent>
                             <Typography variant="h6" gutterBottom>{selectedRadar.facilityId} Information</Typography>
-                            <TextField
-                                label="Radar Split"
-                                placeholder="Separate each entry with a new line"
-                                helperText="This will be communicated to all local controllers that are attached to this radar facility."
-                                variant="outlined"
-                                value={radarSplit.join('\n')}
-                                onChange={handleRadarSplitChange}
-                                fullWidth
-                                multiline
-                                sx={{mb: 1}}
-                            />
-                            <Button variant="contained" onClick={saveRadarSplit} sx={{mb: 2}}>Save Radar Split</Button>
                             <TextField
                                 label="NOTAMs"
                                 placeholder="Separate each NOTAM with a new line"
