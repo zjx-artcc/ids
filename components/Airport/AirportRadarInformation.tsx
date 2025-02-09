@@ -5,6 +5,7 @@ import {socket} from "@/lib/socket";
 import {Box, Grid2, Typography} from "@mui/material";
 import {getColor} from "@/lib/facilityColor";
 import {getAirportRelatedConsolidations, SectorStatus} from "@/actions/airport-split";
+import {toast} from "react-toastify";
 
 export default function AirportRadarInformation({icao, radars}: { icao: string, radars: Radar[], }) {
 
@@ -16,6 +17,7 @@ export default function AirportRadarInformation({icao, radars}: { icao: string, 
         getAirportRelatedConsolidations(icao).then(setRadarConsolidations);
         socket.on('radar-consolidation', () => {
             getAirportRelatedConsolidations(icao).then(setRadarConsolidations);
+            toast.info('Radar consolidations updated');
         });
 
         socket.on('vatsim-data', (data) => {
