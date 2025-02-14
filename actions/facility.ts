@@ -23,21 +23,38 @@ export const getSopLink = async (id: string) => {
 
 export const deleteFacility = async (id: string) => {
 
-    const f = await prisma.facility.delete({
-        where: {
-            id,
-        },
-        include: {
-            airport: true,
-            radar: true,
-        },
-    });
+    try {
+        const f = await prisma.facility.delete({
+            where: {
+                id,
+            },
+            include: {
+                airport: true,
+                radar: true,
+            },
+        });
 
-    if (f.airport) {
-        await log("DELETE", "AIRPORT", `Deleted airport ${f.airport.icao}`);
-    } else if (f.radar) {
-        await log("DELETE", "RADAR", `Deleted radar ${f.radar.name}`);
+        if (f.airport) {
+            await log("DELETE", "AIRPORT", `Deleted airport ${f.airport.icao}`);
+        } else if (f.radar) {
+            await log("DELETE", "RADAR", `Deleted radar ${f.radar.name}`);
+        }
+    } catch (e) {
+        try {
+            await prisma.airport.delete({
+                where: {
+                    iata: id,
+                },
+            });
+        } catch (e) {
+            await prisma.radar.delete({
+                where: {
+                    identifier: id,
+                },
+            });
+        }
     }
+
 
     revalidatePath('/', "layout");
 }
