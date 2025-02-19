@@ -56,10 +56,10 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
             }
 
             atis.forEach((atis) => {
-                const atisLetter = (atis.text_atis as string[])[0]?.match(/ATIS INFO ([A-Z])/i)?.[1] || '-';
+                const atisLetter = atis.atis_code || (atis.text_atis as string[])[0]?.match(/ATIS INFO ([A-Z])/i)?.[1] || '-';
 
                 const atisUpdate = {
-                    atisLetter: atisLetter,
+                    atisLetter,
                     airportConditions: atis.text_atis?.join(' ') || 'N/A',
                     notams: 'N/A',
                 } as AtisUpdate;
