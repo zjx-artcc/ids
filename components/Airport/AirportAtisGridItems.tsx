@@ -56,7 +56,6 @@ export default function AirportAtisGridItems({icao, small, free, atisIntegration
             }
 
             atis.forEach((atis) => {
-                console.log(atis.text_atis);
                 const atisLetter = atis.atis_code || ((atis.text_atis as string[]) || [''])[0]?.match(/ATIS INFO ([A-Z])/i)?.[1] || '-';
 
                 const atisUpdate = {
