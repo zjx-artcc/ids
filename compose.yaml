@@ -3,5 +3,5 @@ services:
     image: ghcr.io/zjx-artcc/ids:master
     ports:
       - 3200:3000
-    container_name: new-website
+    container_name: ids
     restart: unless-stopped
