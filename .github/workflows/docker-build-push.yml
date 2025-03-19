@@ -89,8 +89,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:${{ steps.extract_branch.outputs.branch }}-latest
-            ghcr.io/${{ github.repository }}:${{ steps.extract_branch.outputs.branch }}-${{ env.COMMIT_HASH }}
+            ghcr.io/${{ github.repository }}:${{ steps.extract_branch.outputs.branch }}
   deploy:
     runs-on: self-hosted
     needs: build-and-push
