@@ -28,8 +28,8 @@ export default function ButtonsTray({airport, radar,}: { airport?: Airport, rada
                         href={redirectToViewer('sop', new URLSearchParams({facility: airport?.facilityId || radar?.facilityId || '',}))}>
                         <Button color="secondary">SOP</Button>
                     </Link>
+                    {/*TODO: Change this to be an environment variable  */}
                     <Link
-                        //TODO: Change this to be an environment variable
                         href={redirectToViewer('url', new URLSearchParams({url: 'https://dev.zjxartcc.org/documents'}))}>
                         <Button color="secondary">PUB</Button>
                     </Link>
@@ -57,12 +57,12 @@ export default function ButtonsTray({airport, radar,}: { airport?: Airport, rada
                     <Link href="/">
                         <Button variant="contained" color="primary">EXIT</Button>
                     </Link>
-                    //TODO: Change this to be an environment variable
+                    {/*TODO: Change this to be an environment variable  */}
                     <Link href={redirectToViewer('url', new URLSearchParams({url: 'https://zjxartcc.org/'}))}
                           style={{color: 'inherit'}}>
                         <Button variant="outlined" color="inherit" size="small" style={{borderTopRightRadius:'0px',borderBottomRightRadius:"0px"}}>ZJX WEBSITE</Button>
                     </Link>
-                    //TODO: Change this to be an environment variable
+                    {/*TODO: Change this to be an environment variable  */}
                     <Link href={redirectToViewer('url', new URLSearchParams({url: 'https://asx.zjxartcc.org/'}))}
                           style={{color: 'inherit'}}>
                         <Button variant="outlined" color="inherit" size="small"
