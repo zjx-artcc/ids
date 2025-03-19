@@ -20,7 +20,7 @@ export default async function Layout({children}: { children: React.ReactNode }) 
         return <Typography>Only members of the ARTCC can access the IDS. Login to continue.</Typography>
     }
 
-    const res = await fetch(IS_STAFF_ENDPOINT?.replace('{cid}', session.user.cid) || '');
+    const res = await fetch(IS_STAFF_ENDPOINT + "?cid=" + session.user.cid || '');
     const isStaff: boolean = await res.json();
     if (!isStaff) {
         return <Typography>Only staff members of the ARTCC can access the admin section</Typography>
