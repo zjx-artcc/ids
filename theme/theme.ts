@@ -8,7 +8,7 @@ const theme = createTheme({
             palette: {
                 mode: "dark",
                 primary: {
-                    main: '#500E0E',
+                    main: '#47aec7',
                     contrastText: '#EDEDF5',
                 },
             }
@@ -23,7 +23,7 @@ const theme = createTheme({
     palette: {
         mode: 'dark',
         primary: {
-            main: '#500E0E',
+            main: '#47aec7',
             contrastText: '#EDEDF5',
         }
     }

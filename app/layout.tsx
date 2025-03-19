@@ -20,8 +20,8 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-    title: 'vZDC IDS',
-    description: 'vZDC IDS',
+    title: 'vZJX IDS',
+    description: 'Jacksonville ARTCC IDS',
 };
 
 export default async function RootLayout({

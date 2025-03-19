@@ -29,7 +29,8 @@ export default function ButtonsTray({airport, radar,}: { airport?: Airport, rada
                         <Button color="secondary">SOP</Button>
                     </Link>
                     <Link
-                        href={redirectToViewer('url', new URLSearchParams({url: 'https://vzdc.org/publications/downloads'}))}>
+                        //TODO: Change this to be an environment variable
+                        href={redirectToViewer('url', new URLSearchParams({url: 'https://dev.zjxartcc.org/documents'}))}>
                         <Button color="secondary">PUB</Button>
                     </Link>
                     <Link href={redirectToViewer('airspace')}>
@@ -56,17 +57,19 @@ export default function ButtonsTray({airport, radar,}: { airport?: Airport, rada
                     <Link href="/">
                         <Button variant="contained" color="primary">EXIT</Button>
                     </Link>
-                    <Link href={redirectToViewer('url', new URLSearchParams({url: 'https://vzdc.org/'}))}
+                    //TODO: Change this to be an environment variable
+                    <Link href={redirectToViewer('url', new URLSearchParams({url: 'https://zjxartcc.org/'}))}
                           style={{color: 'inherit'}}>
-                        <Button variant="outlined" color="inherit" size="small" style={{borderTopRightRadius:'0px',borderBottomRightRadius:"0px"}}>VZDC WEBSITE</Button>
+                        <Button variant="outlined" color="inherit" size="small" style={{borderTopRightRadius:'0px',borderBottomRightRadius:"0px"}}>ZJX WEBSITE</Button>
                     </Link>
-                    <Link href={redirectToViewer('url', new URLSearchParams({url: 'https://asx.vzdc.org/'}))}
+                    //TODO: Change this to be an environment variable
+                    <Link href={redirectToViewer('url', new URLSearchParams({url: 'https://asx.zjxartcc.org/'}))}
                           style={{color: 'inherit'}}>
                         <Button variant="outlined" color="inherit" size="small"
                                 style={{borderTopRightRadius: '0px', borderBottomRightRadius: "0px"}}>ASX</Button>
                     </Link>
                 </ButtonGroup>
-                <Typography sx={{mt: 4,}}>&copy; 2024 vZDC</Typography>
+                <Typography sx={{mt: 4,}}>&copy; 2024 vZJX</Typography>
                 <Typography variant="subtitle2" color="red">NOT FOR REAL WORLD USE</Typography>
             </Box>
         </Grid2>
