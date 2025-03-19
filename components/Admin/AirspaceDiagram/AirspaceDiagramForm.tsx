@@ -72,7 +72,7 @@ export default function AirspaceDiagramForm({airspaceDiagram, allFacilities,}: {
                                                         variant="outlined"/>}
                 />
                 <TextField required fullWidth variant="filled" label="Name" name="name"
-                           defaultValue={airspaceDiagram?.name || ''} helperText="Ex. KDCA SOUTH"/>
+                           defaultValue={airspaceDiagram?.name || ''} helperText="Ex. KMCO SOUTH"/>
                 <Typography>Upload image:</Typography>
                 <input type="file" name="image" accept="image/*"/>
                 <Box>

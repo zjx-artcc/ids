@@ -16,9 +16,10 @@ export default async function Navbar({session}: { session: Session | null, }) {
     const {publicRuntimeConfig} = getConfig();
 
     return (
-        <AppBar position="sticky">
+        <AppBar position="sticky" style={{backgroundColor: "#002D2F"}}>
             <Toolbar>
-                {session ? <ZuluClock/> : <Logo/>}
+                <Logo/>
+                {session ? <ZuluClock/> : ''}
                 <Box sx={{ml: 4, p: 0.5, border: 1, borderColor: 'cyan',}}>
                     <Typography variant="subtitle1" color="cyan"
                                 fontWeight="bold">{session?.user.fullName || 'NO SESSION'}</Typography>

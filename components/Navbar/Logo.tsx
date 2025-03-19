@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function Logo() {
     return (
         <Link href="/">
-            <Image src={logo} alt={"Washington ARTCC Logo"} width={215}/>
+            <Image src={logo} alt={"ZJX ARTCC Logo"} width={75} style={{padding: 5}}/>
         </Link>
     );
 }
