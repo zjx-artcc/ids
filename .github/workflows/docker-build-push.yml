@@ -91,3 +91,16 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}:${{ steps.extract_branch.outputs.branch }}-latest
             ghcr.io/${{ github.repository }}:${{ steps.extract_branch.outputs.branch }}-${{ env.COMMIT_HASH }}
+  deploy:
+    runs-on: self-hosted
+    needs: build-and-push
+    environment: Development
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Login to registry
+        run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull image
+        run: docker pull ghcr.io/zjx-artcc/ids:master
+      - name: Run container
+        run: docker compose up -d
