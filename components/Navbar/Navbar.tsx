@@ -10,8 +10,12 @@ import getConfig from 'next/config';
 const {IS_STAFF_ENDPOINT, DEV_MODE} = process.env;
 
 export default async function Navbar({session}: { session: Session | null, }) {
+    if(!IS_STAFF_ENDPOINT) {
+        return <Typography>Staff endpoint undefined.</Typography>
+    }
 
-    const res = await fetch(IS_STAFF_ENDPOINT + "?cid=" + session?.user.cid || '');
+    const res = await fetch(IS_STAFF_ENDPOINT.replace('{cid}', session?.user.cid || ''));
+
     const isStaff: boolean = await res.json();
     const {publicRuntimeConfig} = getConfig();
 
