@@ -65,16 +65,6 @@ jobs:
         run: |
           sed -i "/distDir: 'dist',/d" next.config.ts
 
-      - name: Create .env
-        uses: Infisical/secrets-action@v1.0.7
-        with:
-          client-id: ${{ secrets.CLIENT_ID }}
-          client-secret: ${{ secrets.CLIENT_SECRET }}
-          env-slug: "prod"
-          project-slug: "ids"
-          export-type: "file"
-          file-output-path: "/.env"
-
       - name: Run npm build
         run: npm run build
 
@@ -100,7 +90,6 @@ jobs:
   deploy:
     runs-on: self-hosted
     needs: build-and-push
-    environment: Development
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -110,3 +99,15 @@ jobs:
         run: docker pull ghcr.io/zjx-artcc/ids:master
       - name: Run container
         run: docker compose up -d
+    
+    env:
+      DEV_MODE: false
+      DATABASE_URL: ${{secrets.DATABASE_URL}}
+      NEXTAUTH_URL: ${{secrets.NEXTAUTH_URL}}
+      NEXTAUTH_SECRET: ${{secrets.NEXTAUTH_SECRET}}
+      VATSIM_CLIENT_ID: ${{secrets.VATSIM_CLIENT_ID}}
+      VATSIM_CLIENT_SECRET: ${{secrets.VATSIM_CLIENT_SECRET}}
+      VATUSA_FACILITY: ${{secrets.VATUSA_FACILITY}}
+      IS_STAFF_ENDPOINT: ${{secrets.IS_STAFF_ENDPOINT}}
+      NEXT_PUBLIC_WEBSOCKET_URL: ${{secrets.NEXT_PUBLIC_WEBSOCKET_URL}}
+      UPLOADTHING_TOKEN: ${{secrets.UPLOADTHING_TOKEN}}
